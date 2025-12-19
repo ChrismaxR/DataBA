@@ -17,5 +17,5 @@
 
 - CISO/Chief Security Officer: Spam e-mail tidytuesday -> https://github.com/rfordatascience/tidytuesday/blob/main/data/2023/2023-08-15/readme.md
 - Universiteitsbestuurder -> https://www.kaggle.com/datasets/ayeshaseherr/exame-score-dataset/data
-- Solution Architect/Product Owner -> loadtester data - nu geen voorbeeld van, maar kan wel bogen op inspi van DTenV
+- Solution Architect/Product Owner -> loadtester data - nu geen voorbeeld van, maar kan wel bogen op inspi van huidige opdracht
 - ...
