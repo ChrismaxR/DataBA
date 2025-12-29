@@ -25,12 +25,13 @@ Queue Lenght is zelf als volgt te begrijpen:
 
 
 ### Informatiebehoefte van Marieke:
-1. Wat is de benuttingsgraad van mijn behandelkamers in mijn ziekenhuis?
-2. Is de verhouding met mijn zorgcapaciteit in balans?
-3. Hoe ontwikkelt benutting door de tijd?
-4. Hoe ontwikkelt capaciteit zich door de tijd?
-5. Welke tools heb ik om eventuele problemen te voorkomen?
-6. Kan ik benutting en capaciteit modelleren om forecasts te draaien?
+1. Wat zijn wachttijden in mijn ziekenhuis? 
+2. Wat is de benuttingsgraad van mijn behandelkamers in mijn ziekenhuis?
+3. Is de verhouding met mijn zorgcapaciteit in balans?
+4. Hoe ontwikkelt benutting door de tijd?
+5. Hoe ontwikkelt capaciteit zich door de tijd?
+6. Welke tools heb ik om eventuele problemen te voorkomen?
+7. Kan ik benutting en capaciteit modelleren om forecasts te draaien?
 
 ## Model van queues in Theme Hospital
 ![](./story2_model.png)
