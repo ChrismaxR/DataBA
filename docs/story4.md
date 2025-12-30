@@ -29,7 +29,7 @@ Psychiatric Room: diagnose + behandeling
 
 #### 🦠 Aandoeningen Behandelroutes voor patiënten
 
-| aandoening           | aanmelden  | diagnose           | behandeling             | scenario |
+| aandoening           | aanmelden  | diagnose           | behandeling             | behandelroute |
 |----------------------|------------|--------------------|-------------------------|----------|
 | Sleeping Illness     | receptie   | GP's Office        | The Ward                | A        |
 | Discrete Itching     | receptie   | GP's Office        | The Ward                | A        |
@@ -87,7 +87,7 @@ Hier volgt ook uit een aantal scenarios die ik op kan zetten die een gemeenschap
 |  12 | Benutting  |  Tijd per tijdseenheid kamer in gebruik | Δfct_kamer.datumTijd between fct_kamer.kamerStatus                               |  True        |
 |  13 | Benutting  |  Benuttingsgraad per specialisme        | zelfde als id = 12 + group by fct_kamer.kamerTypeId                              |  True        | 
 
-
+De pseudocode helpt al een beeld vormen van wat voor queries ik denkstraks nodig te hebben voor het echte data wrangle-werk. 
 
 ### 🗺️ Gegevensmodel
 
