@@ -20,8 +20,10 @@ Dit is Dr. Marieke van Dalen, COO bij ThemeHospital in ThemeVille. Zij is 44 jaa
 - cashflow van het ziekenhuis
 - reputatie van het ziekenhuis
 
+Theme Hospital kent een maandelijkse cyclus om te rapporteren en om de operatie op dit vlak te reviewen.
+
 Queue Lenght is zelf als volgt te begrijpen:
-![](./story2_besluitcontext_model.png)
+![](./png/story2_besluitcontext_model.png)
 
 
 ### Informatiebehoefte van Marieke:
@@ -34,4 +36,4 @@ Queue Lenght is zelf als volgt te begrijpen:
 7. Kan ik benutting en capaciteit modelleren om forecasts te draaien?
 
 ## Model van queues in Theme Hospital
-![](./story2_model.png)
+![](./png/story2_model.png)
