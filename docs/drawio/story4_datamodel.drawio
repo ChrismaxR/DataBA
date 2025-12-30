@@ -1,11 +1,11 @@
 <mxfile host="65bd71144e">
     <diagram id="iubkzWt10ghXN5q02dKK" name="Pagina-1">
-        <mxGraphModel dx="3517" dy="4129" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="6207" dy="7089" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
                 <mxCell id="160" value="" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillStyle=solid;fontFamily=Menlo;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DMenlo;strokeColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="-90" y="-40" width="1800" height="1451" as="geometry"/>
+                    <mxGeometry x="-120" y="-70" width="1800" height="1451" as="geometry"/>
                 </mxCell>
                 <mxCell id="6" value="&lt;b&gt;fct_patient&lt;/b&gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontFamily=Menlo;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DMenlo;fillColor=#D5E8D4;strokeColor=#82b366;" parent="1" vertex="1">
                     <mxGeometry x="740" y="350" width="140" height="198" as="geometry"/>
@@ -389,13 +389,13 @@
                 <mxCell id="229" value="Ja, denk het wel want ik kan dan de tabellen mooi smal houden en business logica in de dim tabellen zo veel mogelijk stoppen.&amp;nbsp;" style="shape=note;strokeWidth=2;fontSize=14;size=20;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
                     <mxGeometry x="1110" y="1160" width="173" height="121" as="geometry"/>
                 </mxCell>
-                <mxCell id="233" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;" edge="1" parent="1" source="231" target="232">
+                <mxCell id="233" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;" parent="1" source="231" target="232" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="231" value="Is het noodzakelijk om een koppeling te leggen tussen fct_patient en fct_kamer. JA, maar hoe leg ik die?" style="shape=note;strokeWidth=2;fontSize=14;size=20;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#666600;" vertex="1" parent="1">
+                <mxCell id="231" value="Is het noodzakelijk om een koppeling te leggen tussen fct_patient en fct_kamer. JA, maar hoe leg ik die?" style="shape=note;strokeWidth=2;fontSize=14;size=20;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#666600;" parent="1" vertex="1">
                     <mxGeometry x="630" y="970" width="173" height="121" as="geometry"/>
                 </mxCell>
-                <mxCell id="232" value="Deel het probleem op, begn eerst met fct_kamer te maken, want die is onafhankelijk van fct_patient" style="shape=note;strokeWidth=2;fontSize=14;size=20;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#666600;" vertex="1" parent="1">
+                <mxCell id="232" value="Deel het probleem op, begn eerst met fct_kamer te maken, want die is onafhankelijk van fct_patient" style="shape=note;strokeWidth=2;fontSize=14;size=20;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#666600;" parent="1" vertex="1">
                     <mxGeometry x="783.5" y="1111" width="173" height="121" as="geometry"/>
                 </mxCell>
             </root>

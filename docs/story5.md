@@ -9,6 +9,39 @@
 
 ## 📖 Data dictionaries
 
+#### fct_patient
+| kolomnaam         | kolomOmschrijving                            |
+|-------------------|----------------------------------------------|
+| id                | |
+| patientId         | |
+| datumTijd         | |
+| datumAankomst     | |
+| behandelStatus    | |
+| diagnoseId        | |
+
+#### fct_kamer
+| kolomnaam         | kolomOmschrijving                            |
+|-------------------|----------------------------------------------|
+| id                | |
+| kamerId           | |
+| datumTijd         | |
+| kamerTypeId       | |
+| kamerStatus       | |
+ 
+#### dim_diagnose
+| kolomnaam            | kolomOmschrijving                            |
+|----------------------|----------------------------------------------|
+| id                   | |
+| diagnoseOmschrijving | |
+| kamerTypeId          | |
+
+#### dim_kamerType 
+| kolomnaam         | kolomOmschrijving                            |
+|-------------------|----------------------------------------------|
+| id                | |
+| kamerType         | |
+
+
 ## ⭐️ Ideaaltypen voor tabellen
 
 ## 🎛️ Algemene constraints
@@ -43,13 +76,27 @@
 
 ## ✏️ Scenarios
 
-Easy
-Altijd kamers beschikbaar, geen tot minimale wachttijden
-% records
+#### Easy: altijd kamers beschikbaar, geen tot minimale wachttijden
 
+| parameterType     | parameterSettings  |
+|-------------------|--------------------|
+| % records         |   70%              |
+| kamerAvailability |  100%              |
 
-Medium -> Geen kamers beschikbaar, kortere wachttijden
+#### Medium: Geen kamers beschikbaar, kortere wachttijden
+| parameterType     | parameterSettings  |
+|-------------------|--------------------|
+| % records         |   20%              |
+| kamerAvailability |  80-95%            |
 
-Hard -> Geen kamers beschikbaar, langere wachttijden
+#### Hard -> Geen kamers beschikbaar, langere wachttijden
+| parameterType     | parameterSettings  |
+|-------------------|--------------------|
+| % records         |    5%              |
+| kamerAvailability |  70-80%            |
 
-Ultra hard -> Hard, maar ook met foute diagnoses
+#### Ultra hard -> Hard, maar ook met foute diagnoses
+| parameterType     | parameterSettings  |
+|-------------------|--------------------|
+| % records         |    5%              |
+| kamerAvailability |  70-80%            |
