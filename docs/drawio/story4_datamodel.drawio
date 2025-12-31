@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="iubkzWt10ghXN5q02dKK" name="Pagina-1">
-        <mxGraphModel dx="6207" dy="7089" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1983" dy="1547" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -38,7 +38,7 @@
                     <mxGeometry y="178" width="140" height="20" as="geometry"/>
                 </mxCell>
                 <mxCell id="19" value="&amp;lt;&amp;lt;enumeration&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;behandelStatus&lt;/b&gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontFamily=Menlo;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DMenlo;" parent="1" vertex="1">
-                    <mxGeometry x="430" y="309" width="183" height="200" as="geometry"/>
+                    <mxGeometry x="470" y="360" width="183" height="200" as="geometry"/>
                 </mxCell>
                 <mxCell id="210" value="WachtenOpReceptie" style="text;html=1;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Menlo;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DMenlo;" parent="19" vertex="1">
                     <mxGeometry y="40" width="183" height="20" as="geometry"/>

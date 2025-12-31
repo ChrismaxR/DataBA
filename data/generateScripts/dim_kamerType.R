@@ -1,5 +1,3 @@
-library(tidyverse)
-
 dim_kamerType <- tibble::tibble(
   kamerType = c(
     "Reception",

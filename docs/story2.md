@@ -12,6 +12,8 @@ Op te leveren artefacten:
 ![](./Persona.png)
 Dit is Dr. Marieke van Dalen, COO bij ThemeHospital in ThemeVille. Zij is 44 jaar en zij vervult al een aantal jaren haar rol in het ziekenhuis. Ze voelt zich betrokken bij het ziekenhuis en het algemene welbevinden van patiënten en medewerkers in Theme Hospital. Een van haar centrale richtpunten is een fluïde doorloop van het zorgsysteem in het ziekenhuis: van aankomst tot afronding van de juiste behandeling. Hierbij ligt de sleutel in het effectief managen van wachttijden voor patiënten ten behoeve van een diagnose of een behandeling. In Theme Hospital wordt in de zin van wachttijden gesproken over "Queue Length". 
 
+> Centrale vraag van Marieke: “Waar moet ik volgende maand capaciteit toevoegen of herverdelen om wachttijden onder X te houden?”
+
 ## Besluitcontext
 
 "Queue Length" management is een belangrijke factor in:

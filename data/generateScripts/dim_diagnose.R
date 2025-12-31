@@ -1,7 +1,4 @@
-library(tidyverse)
-
 diagnoseOmschrijving <- c(
-  "Nog Geen Diagnose",
   "Sleeping Illness",
   "Discrete Itching",
   "Fake Blood",
