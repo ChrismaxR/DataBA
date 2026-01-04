@@ -8,9 +8,9 @@ datum_vector <- seq(as.Date("2025-01-01"), as.Date("2025-12-31"), by = "day")
 # creëer vector voor alle mogelijke tijdstippen op een dag met een interval van 6 minuten
 tijd_vector <- format(
   seq(
-    as.POSIXct("2000-01-01 00:00:00"),
-    as.POSIXct("2000-01-01 23:59:00"),
-    by = "6 min"
+    as.POSIXct("2000-01-01 08:45:00"),
+    as.POSIXct("2000-01-01 21:00:00"),
+    by = "15 min"
   ),
   "%H:%M:%S"
 )

@@ -29,6 +29,7 @@
 | datumAankomst     | Datum |
 | behandelStatus    | |
 | diagnoseId        | |
+| eenSoortMetriek?  | |
 
 #### fct_kamer
 | kolomnaam         | kolomOmschrijving                            |
@@ -38,6 +39,7 @@
 | datumTijd         | |
 | kamerTypeId       | |
 | kamerStatus       | |
+| eenSoortMetriek?  | |
  
 #### dim_diagnose
 | kolomnaam            | kolomOmschrijving                            |

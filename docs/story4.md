@@ -29,7 +29,7 @@ Psychiatric Room: diagnose + behandeling
 
 #### 🦠 Aandoeningen Behandelroutes voor patiënten
 
-| id  | aandoening           | aanmelden  | diagnose (kamerId)    | behandeling  (kamerId)       | behandelroute |
+| id  | aandoening           | aanmelden  | diagnose    (kamerId) | behandeling        (kamerId) | behandelroute |
 |-----|----------------------|------------|-----------------------|------------------------------|----------|
 |  1  | Sleeping Illness     | receptie   | GP's Office       (2) | The Ward                ( 8) | A        |
 |  2  | Discrete Itching     | receptie   | GP's Office       (2) | The Ward                ( 8) | A        |
@@ -115,7 +115,7 @@ Effectief maak ik drie lagen:
 
 1. Simulatielaag -> Wat gebeurt wanneer?
 2. Event-laag -> Wat is er gebeurd? En op welk tijdstip?
-3. Analytische laag -> Op welke wijze moeten events geaggregeerd worden? (Afgeleid)
+3. Analytische laag -> Op welke wijze moeten feiten uit de events afgeleid en geaggregeerd worden? 
 
 Voordelen:
 1. Event-driven -> verbetert realisme
@@ -151,3 +151,14 @@ behandelkamerEvents:
 - MachineKapot
 - StaffMetPauze
 - StaffOntslagGenomen
+
+fct_event.datumTijd: 
+- alleen tijdstippen mogelijk tussen 9:00 en 21.00u, want alleen dan wordt er gewerkt. 
+- voor Behandelkamers geldt:
+	- receptieduur is 15 min. 
+	- diagnose duurt 30 min. 
+	- behandeling duurt 60 min. 
+- daarmee zijn er dagelijks potentieel, als we van alle kamers er 1 hebben:
+	- 50 receptieslots
+	- 25 diagnoseslots
+	- 12,5 behandelslots

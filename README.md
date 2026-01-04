@@ -1,20 +1,14 @@
-░█████████  ░██                                  
-░██     ░██ ░██                                  
-░██     ░██ ░██  ░██████    ░███████   ░███████  
-░█████████  ░██       ░██  ░██    ░██ ░██    ░██ 
-░██         ░██  ░███████  ░██        ░█████████ 
-░██         ░██ ░██   ░██  ░██    ░██ ░██        
-░██         ░██  ░█████░██  ░███████   ░███████  
+ /$$$$$$$  /$$$$$$$$  /$$$$$$  /$$$$$$$  /$$      /$$ /$$$$$$$$
+| $$__  $$| $$_____/ /$$__  $$| $$__  $$| $$$    /$$$| $$_____/
+| $$  \ $$| $$      | $$  \ $$| $$  \ $$| $$$$  /$$$$| $$      
+| $$$$$$$/| $$$$$   | $$$$$$$$| $$  | $$| $$ $$/$$ $$| $$$$$   
+| $$__  $$| $$__/   | $$__  $$| $$  | $$| $$  $$$| $$| $$__/   
+| $$  \ $$| $$      | $$  | $$| $$  | $$| $$\  $ | $$| $$      
+| $$  | $$| $$$$$$$$| $$  | $$| $$$$$$$/| $$ \/  | $$| $$$$$$$$
+|__/  |__/|________/|__/  |__/|_______/ |__/     |__/|________/
 
-░██                   ░██        ░██                     
-░██                   ░██        ░██                     
-░████████   ░███████  ░██  ░████████  ░███████  ░██░████  
-░██    ░██ ░██    ░██ ░██ ░██    ░██ ░██    ░██ ░███          
-░██    ░██ ░██    ░██ ░██ ░██    ░██ ░█████████ ░██            
-░██    ░██ ░██    ░██ ░██ ░██   ░███ ░██        ░██            
-░██    ░██  ░███████  ░██  ░█████░██  ░███████  ░██            
-                                                                                                                   
-
+Theme Hospital • Wachttijden & Benutting dashboard                      
+                                                                                                         
 # 0.  Project management en setup
 
 # Governance
@@ -23,7 +17,6 @@ Github repo: https://github.com/ChrismaxR/DataBA/tree/main
 
 # 1.	The decision problem
 # 2.	Why this data
-
 
 > “De synthetische dataset is afgeleid van een discrete-event simulatie.
 > Operationele afhankelijkheden (zoals kamerbeschikbaarheid) worden opgelost tijdens datageneratie.
@@ -39,3 +32,4 @@ Github repo: https://github.com/ChrismaxR/DataBA/tree/main
 - seasonal influences on utilization and queue length
 - epidemic simulation
 - multiple stakeholders with conflicting interests
+- scenarios bouwen: wat als we meer kamers hadden gehad/meer patiënten te verstouwen hadden gehad, enz.
