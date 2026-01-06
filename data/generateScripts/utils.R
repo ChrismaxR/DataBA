@@ -1,5 +1,4 @@
 library(tidyverse)
-
 set.seed(42)
 
 # creëer vector voor alle datums in 2025
@@ -18,8 +17,47 @@ tijd_vector <- format(
 scenario <- c("Easy", "Medium", "Hard", "Ultra hard")
 
 # vector met mogelijke aandoeningen
-source("data/generateScripts/dim_diagnose.R")
-diagnoseOmschrijving
+aandoening <- tibble::tibble(
+  aandoeningOmschrijving = c(
+    "Sleeping Illness",
+    "Discrete Itching",
+    "Fake Blood",
+    "The Squits",
+    "Sweaty Palms",
+    "Gastric Ejections",
+    "Uncommon Cold",
+    "Chronic Nosehair",
+    "Hairyitis",
+    "Baldness",
+    "King Complex",
+    "Infectious Laughter",
+    "TV Personalities",
+    "Ruptured Nodules",
+    "Broken Wind",
+    "Golf Stones",
+    "Iron Lungs",
+    "Gut Rot",
+    "Heaped Piles",
+    "3rd Degree Sideburns",
+    "Bloaty Head",
+    "Slack Tongue",
+    "Broken Heart",
+    "Spare Ribs",
+    "Corrugated Ankles",
+    "Fractured Bones",
+    "Kidney Beans",
+    "Unexpected Swelling",
+    "Serious Radiation",
+    "Jellyitis",
+    "Transparency",
+    "Invisibility",
+    "Alien DNA"
+  )
+) |>
+  transmute(
+    id = row_number(), # genereer een Id
+    aandoeningOmschrijving
+  )
 
 # Eerste opzet van een patienten tabel
 # ik kopel hier ook al een aprioriAandoening per patient om hen een te behandelen ziekte te geven
@@ -31,53 +69,27 @@ patienten <- tibble::tibble(
   patientId = as.integer(seq(1, 16463, by = 1))
 ) |>
   mutate(
-    aprioriAandoening = sample(diagnoseOmschrijving, n(), replace = TRUE),
+    aprioriAandoeningId = sample(aandoening$id, n(), replace = TRUE),
     behandelRoute = case_when(
-      aprioriAandoening %in%
-        c("Sleeping Illness", "Discrete Itching", "Fake Blood") ~ "A",
-      aprioriAandoening %in%
-        c(
-          "The Squits",
-          "Sweaty Palms",
-          "Gastric Ejections",
-          "Uncommon Cold"
-        ) ~ "B",
-      aprioriAandoening %in% c("Chronic Nosehair", "Hairyitis") ~ "C",
-      aprioriAandoening %in% c("Baldness") ~ "D",
-      aprioriAandoening %in%
-        c("King Complex", "Infectious Laughter", "TV Personalities") ~ "E",
-      aprioriAandoening %in%
-        c("Ruptured Nodules", "Broken Wind", "Golf Stones", "Iron Lungs") ~ "F",
-      aprioriAandoening %in%
-        c("Gut Rot", "Heaped Piles") ~ "G",
-      aprioriAandoening %in%
-        c("3rd Degree Sideburns") ~ "H",
-      aprioriAandoening %in%
-        c("Bloaty Head") ~ "I",
-      aprioriAandoening %in%
-        c("Slack Tongue") ~ "J",
-      aprioriAandoening %in%
-        c("Broken Heart") ~ "K",
-      aprioriAandoening %in%
-        c(
-          "Spare Ribs",
-          "Corrugated Ankles",
-          "Fractured Bones"
-        ) ~ "L",
-      aprioriAandoening %in%
-        c("Kidney Beans") ~ "M",
-      aprioriAandoening %in%
-        c("Unexpected Swelling") ~ "N",
-      aprioriAandoening %in%
-        c("Serious Radiation") ~ "O",
-      aprioriAandoening %in%
-        c("Jellyitis") ~ "P",
-      aprioriAandoening %in%
-        c("Transparency") ~ "Q",
-      aprioriAandoening %in%
-        c("Invisibility") ~ "R",
-      aprioriAandoening %in%
-        c("Alien DNA") ~ "S",
+      aprioriAandoeningId %in% c(1:3) ~ "A",
+      aprioriAandoeningId %in% c(4:7) ~ "B",
+      aprioriAandoeningId %in% c(8, 9) ~ "C",
+      aprioriAandoeningId %in% c(10) ~ "D",
+      aprioriAandoeningId %in% c(11:13) ~ "E",
+      aprioriAandoeningId %in% c(14:17) ~ "F",
+      aprioriAandoeningId %in% c(18, 19) ~ "G",
+      aprioriAandoeningId %in% c(20) ~ "H",
+      aprioriAandoeningId %in% c(21) ~ "I",
+      aprioriAandoeningId %in% c(22) ~ "J",
+      aprioriAandoeningId %in% c(23) ~ "K",
+      aprioriAandoeningId %in% c(24:26) ~ "L",
+      aprioriAandoeningId %in% c(27) ~ "M",
+      aprioriAandoeningId %in% c(28) ~ "N",
+      aprioriAandoeningId %in% c(29) ~ "O",
+      aprioriAandoeningId %in% c(30) ~ "P",
+      aprioriAandoeningId %in% c(31) ~ "Q",
+      aprioriAandoeningId %in% c(32) ~ "R",
+      aprioriAandoeningId %in% c(33) ~ "S",
       T ~ "Error"
     ),
     diagnoseKamerId = case_when(
@@ -110,4 +122,31 @@ patienten <- tibble::tibble(
       replace = TRUE,
       prob = c(0.70, 0.20, 0.05, 0.05)
     )
+  )
+
+events <- tibble::tibble(
+  eventType = c(
+    "wachtenOpReceptie",
+    "inReceptie",
+    "wachtenOpDiagnose",
+    "inDiagnose",
+    "wachtenOpBehandeling",
+    "inBehandeling",
+    "ontslagen",
+    "wachtenOpNieuweDiagnose",
+    "vrij",
+    "inGebruik",
+    "machineKapot",
+    "staffMetPauze",
+    "staffOntslagGenomen"
+  ),
+  eventTypeCategorie = c(
+    rep("patientEvent", 8),
+    rep("kamerEvent", 5)
+  )
+) |>
+  transmute(
+    id = row_number(),
+    eventType,
+    eventTypeCategorie
   )

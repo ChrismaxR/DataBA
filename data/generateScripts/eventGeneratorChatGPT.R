@@ -42,11 +42,12 @@ rooms <- dim_kamerType |>
   ) |>
   uncount(kamer_count, .remove = FALSE, .id = "room_seq") |>
   mutate(
-    kamer_id = row_number(),
+    kamerId = row_number(),
     kamerTypeId = id,
-    next_free = as.POSIXct("2025-01-01 00:00:00", tz = "UTC") # tracks when a specific room frees up
+    next_free = as.POSIXct("2025-01-01 00:00:00", tz = "UTC")
+    # column next_free tracks when a specific room frees up, initialy set to first possible moment in 2025
   ) |>
-  select(kamer_id, kamerTypeId, kamerType, next_free)
+  select(kamerId, kamerTypeId, kamerType, next_free)
 
 # Draw random arrival datetimes by sampling date and time separately
 sample_arrival <- function(n) {
@@ -64,26 +65,35 @@ apply_availability <- function(time_point, availability) {
 }
 
 # Build the ordered event trace for a single patient and update room schedule
-generate_patient_events <- function(p_row, rooms_state) {
-  scen <- scenario_params |> filter(scenario == p_row$scenario)
+generate_patient_events <- function(
+  p_row, #regel uit de patienten tabel
+  rooms_state
+) {
+  scen <- scenario_params |>
+    filter(scenario == p_row$scenario)
 
-  rec_dur <- dminutes(12)
-  diag_dur <- dminutes(sample(20:30, 1))
-  treat_dur <- dminutes(sample(40:60, 1))
+  durationReception <- dminutes(12) # Bepaal duur van patient bij de receptie
+  durationDiagnosis <- dminutes(sample(20:30, 1)) # Bepaal duur van patient in de diagnosekamer
+  durationTreatment <- dminutes(sample(40:60, 1)) # Bepaal duur van patient in de behandelkamer
 
   wait_diag <- dminutes(runif(1, scen$wait_diag_min, scen$wait_diag_max))
   wait_treat <- dminutes(runif(1, scen$wait_treat_min, scen$wait_treat_max))
 
-  t_rec <- p_row$arrival_dt
-  t_rec_end <- t_rec + rec_dur
+  t_rec <- p_row$aankomstDatumTijd
+  t_rec_end <- t_rec + durationReception
 
-  # allocate the earliest-available diagnosis room of the required type
-  diag_room <- rooms_state |>
-    filter(kamerTypeId == p_row$diagnoseKamerId) |>
+  # allocate the earliest-available reception room
+  reception_room <- rooms_state |>
+    filter(kamerTypeId == 1) |>
     slice_min(next_free, with_ties = FALSE)
 
   t_diag_start <- max(t_rec_end, diag_room$next_free) + wait_diag
-  t_diag_end <- t_diag_start + diag_dur
+  t_diag_end <- t_diag_start + durationDiagnosis
+
+  # allocate the earliest-available diagnois room of the required type
+  treat_room <- rooms_state |>
+    filter(kamerTypeId == p_row$behandelKamerId) |>
+    slice_min(next_free, with_ties = FALSE)
 
   # allocate the earliest-available treatment room of the required type
   treat_room <- rooms_state |>
@@ -91,24 +101,24 @@ generate_patient_events <- function(p_row, rooms_state) {
     slice_min(next_free, with_ties = FALSE)
 
   t_treat_start <- max(t_diag_end, treat_room$next_free) + wait_treat
-  t_treat_end <- t_treat_start + treat_dur
+  t_treat_end <- t_treat_start + durationTreatment
 
   events <- tribble(
-    ~event_type            , ~datumTijd                 , ~patientId      , ~kamerId            , ~kamerTypeId          ,
-    "WachtenOpReceptie"    , t_rec                      , p_row$patientId , NA_integer_         , 1L                    ,
-    "InReceptie"           , t_rec                      , p_row$patientId , NA_integer_         , 1L                    ,
-    "WachtenOpDiagnose"    , t_diag_start - wait_diag   , p_row$patientId , NA_integer_         , p_row$diagnoseKamerId ,
-    "InDiagnose"           , t_diag_start               , p_row$patientId , diag_room$kamer_id  , p_row$diagnoseKamerId ,
-    "WachtenOpBehandeling" , t_treat_start - wait_treat , p_row$patientId , NA_integer_         , p_row$behandelKamerId ,
-    "InBehandeling"        , t_treat_start              , p_row$patientId , treat_room$kamer_id , p_row$behandelKamerId ,
-    "Ontslagen"            , t_treat_end                , p_row$patientId , treat_room$kamer_id , p_row$behandelKamerId
+    ~event_type            , ~datumTijd                 , ~patientId      , ~kamerId           , ~kamerTypeId          ,
+    "WachtenOpReceptie"    , t_rec                      , p_row$patientId , NA_integer_        , 1L                    , #klopt niet!
+    "InReceptie"           , t_rec                      , p_row$patientId , NA_integer_        , 1L                    , #klopt niet!
+    "WachtenOpDiagnose"    , t_diag_start - wait_diag   , p_row$patientId , NA_integer_        , p_row$diagnoseKamerId , #klopt niet!
+    "InDiagnose"           , t_diag_start               , p_row$patientId , diag_room$kamerId  , p_row$diagnoseKamerId , #klopt niet!
+    "WachtenOpBehandeling" , t_treat_start - wait_treat , p_row$patientId , NA_integer_        , p_row$behandelKamerId , #klopt niet!
+    "InBehandeling"        , t_treat_start              , p_row$patientId , treat_room$kamerId , p_row$behandelKamerId , #klopt niet!
+    "Ontslagen"            , t_treat_end                , p_row$patientId , treat_room$kamerId , p_row$behandelKamerId
   )
 
   rooms_state$next_free[
-    rooms_state$kamer_id == diag_room$kamer_id
+    rooms_state$kamerId == diag_room$kamerId
   ] <- apply_availability(t_diag_end, scen$availability)
   rooms_state$next_free[
-    rooms_state$kamer_id == treat_room$kamer_id
+    rooms_state$kamerId == treat_room$kamerId
   ] <- apply_availability(t_treat_end, scen$availability)
 
   list(events = events, rooms_state = rooms_state)
@@ -120,8 +130,8 @@ generate_fct_event <- function(
   out_path = "data/fct_event.csv"
 ) {
   patienten_ext <- patienten |>
-    mutate(arrival_dt = sample_arrival(n())) |>
-    arrange(arrival_dt)
+    mutate(aankomstDatumTijd = sample_arrival(n())) |>
+    arrange(aankomstDatumTijd)
 
   rooms_state <- rooms
   event_rows <- vector("list", nrow(patienten_ext))

@@ -23,7 +23,7 @@
 | The Ward               |                   | Jelly Vat           |              |
 | Psychiatric Room       |                   |                     |              |
 
-**Nota Bene:**
+**Nota Bene:** In het spel geldt:
 The Ward: diagnose + behandeling
 Psychiatric Room: diagnose + behandeling
 
