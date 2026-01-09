@@ -7,17 +7,17 @@ datum_vector <- seq(as.Date("2025-01-01"), as.Date("2025-12-31"), by = "day")
 # creëer vector voor alle mogelijke tijdstippen op een dag met een interval van 6 minuten
 tijd_vector <- format(
   seq(
-    as.POSIXct("2000-01-01 08:45:00"),
+    as.POSIXct("2000-01-01 09:00:00"),
     as.POSIXct("2000-01-01 21:00:00"),
-    by = "15 min"
+    by = "1 min"
   ),
   "%H:%M:%S"
 )
 
-scenario <- c("Easy", "Medium", "Hard", "Ultra hard")
+scenarios <- c("happyFlow", "foutieveDiagnose")
 
-# vector met mogelijke aandoeningen
-aandoening <- tibble::tibble(
+# tibble met mogelijke aandoeningen
+aandoeningDimensies <- tibble::tibble(
   aandoeningOmschrijving = c(
     "Sleeping Illness",
     "Discrete Itching",
@@ -65,7 +65,7 @@ aandoening <- tibble::tibble(
 # Daarnaast map ik ook de behandelroute en de te bezoeken kamers volgens mij logica uit story 4.
 # Tot slot heb ik ook een scenario toegekend aan elke patiënt.
 
-patienten <- tibble::tibble(
+patientenStamTabel <- tibble::tibble(
   patientId = as.integer(seq(1, 16463, by = 1))
 ) |>
   mutate(
@@ -90,7 +90,7 @@ patienten <- tibble::tibble(
       aprioriAandoeningId %in% c(31) ~ "Q",
       aprioriAandoeningId %in% c(32) ~ "R",
       aprioriAandoeningId %in% c(33) ~ "S",
-      T ~ "Error"
+      TRUE ~ "Error"
     ),
     diagnoseKamerId = case_when(
       behandelRoute %in% c("A", "B", "C", "D", "E") ~ 2L,
@@ -99,7 +99,7 @@ patienten <- tibble::tibble(
       behandelRoute %in% c("L", "M", "N", "O") ~ 7L,
       behandelRoute %in% c("P", "Q") ~ 5L,
       behandelRoute %in% c("R", "S") ~ 6L,
-      T ~ -1L
+      TRUE ~ -1L
     ),
     behandelKamerId = case_when(
       behandelRoute %in% c("A") ~ 8L,
@@ -114,26 +114,32 @@ patienten <- tibble::tibble(
       behandelRoute %in% c("O") ~ 20L,
       behandelRoute %in% c("P") ~ 19L,
       behandelRoute %in% c("S") ~ 13L,
-      T ~ -1L
+      TRUE ~ -1L
     ),
     scenario = sample(
-      scenario,
+      x = scenario,
       n(),
       replace = TRUE,
-      prob = c(0.70, 0.20, 0.05, 0.05)
-    )
+      prob = c(0.95, 0.05)
+    ),
+    juisteDiagnoseKamerId = if_else(scenario == "foutieveDiagnose", 2, NULL)
+    juisteBehandelKamerId = if_else(scenario == "foutieveDiagnose", 8, NULL)
   )
 
-events <- tibble::tibble(
+eventDimensies <- tibble::tibble(
   eventType = c(
-    "wachtenOpReceptie",
-    "inReceptie",
-    "wachtenOpDiagnose",
-    "inDiagnose",
-    "wachtenOpBehandeling",
-    "inBehandeling",
-    "ontslagen",
-    "wachtenOpNieuweDiagnose",
+    "aankomst", # patiënt komt aan in het Ziekenhuis
+    "inWachtrijReceptie", # patiënt neemt plaats in wachtrij voor de receptie
+    "inReceptie", # patiënt schrijft zich in bij de receptie
+    "inWachtrijDiagnose", # patiënt neemt plaats in de wachtrij voor diagnose
+    "inDiagnose", #patiënt wordt gediagnostiseerd door diagnosepersoneel
+    "inWachtrijBehandeling", # patiënt neemt plaats in wachtrij voor een passende behandeling
+    "inBehandeling", # patiënt is in behandelkamer en ondergaat behandeling
+    "ontslagen", # patiënt is behandeld en wordt ontslagen uit het ziekenhuis
+    "inWachtrijNieuweDiagnose", # Na behandeling blijkt patiënt niet juiste diagnose te hebben gekregen en moet nogmaals gediagnostiseerd worden; patiënt neemt plaats in wachtrij voor herdiagnose
+    "inNieuweDiagnose", # patiënt wordt nogmaals gediagnostiseerd
+    "inWachtrijNieuweBehandeling", # patiënt neemt plaats in wachtrij voor een nieuwe behandeling
+    "inNieuweBehandeling", # patiënt opnieuw in behandeling
     "vrij",
     "inGebruik",
     "machineKapot",
@@ -141,7 +147,7 @@ events <- tibble::tibble(
     "staffOntslagGenomen"
   ),
   eventTypeCategorie = c(
-    rep("patientEvent", 8),
+    rep("patientEvent", 12),
     rep("kamerEvent", 5)
   )
 ) |>
@@ -149,4 +155,105 @@ events <- tibble::tibble(
     id = row_number(),
     eventType,
     eventTypeCategorie
+  )
+
+kamerDimensies <- tibble::tibble(
+  kamerType = c(
+    "Reception",
+    "GP’s Office",
+    "General Diagnosis Room",
+    "Cardiogram",
+    "Scanner",
+    "Ultrascan",
+    "X-Ray",
+    "The Ward",
+    "Psychiatric Room",
+    "Pharmacy",
+    "Operating Theatre",
+    "Inflation Room",
+    "DNA Fixer",
+    "Hair Restoration",
+    "ResearchDept",
+    "Slack Tongue Clinic",
+    "Fracture Clinic",
+    "Electrolysis",
+    "Jelly Vat",
+    "Decontamination"
+  )
+) |>
+  transmute(
+    id = row_number(),
+    kamerType
+  ) |>
+  mutate(
+    kamerCount = c(
+      4, # Reception
+      4, # GP's Office
+      3, # General Diagnosis Room
+      1, # Cardiogram
+      2, # Scanner
+      2, # Ultrascan
+      3, # X-Ray
+      3, # The Ward
+      2, # Psychiatric Room
+      3, # Pharmacy
+      2, # Operating Theatre
+      1, # Inflation Room
+      1, # DNA Fixer
+      1, # Hair Restoration
+      0, # ResearchDept (unused in routes)
+      1, # Slack Tongue Clinic
+      1, # Fracture Clinic
+      1, # Electrolysis
+      1, # Jelly Vat
+      1 # Decontamination
+    )
+  ) |>
+  uncount(kamerCount, .remove = FALSE, .id = "room_seq") |>
+  mutate(
+    kamerId = row_number(),
+    kamerTypeId = id,
+    volgendeVrijeDatumTijd = as.POSIXct(
+      # houdt bij wanneer een specifieke kamer vrij komt - initieel op allereerste minuut van 2025 gezet
+      "2025-01-01 00:00:00",
+      tz = "UTC"
+    ),
+    minDuratieKamer = case_when(
+      kamerTypeId == 1 ~ 5,
+      kamerTypeId %in% c(2, 3) ~ 9,
+      kamerTypeId %in% c(4, 5) ~ 11,
+      kamerTypeId %in% c(6, 7) ~ 15,
+      kamerTypeId %in% c(8, 9, 10) ~ 25,
+      kamerTypeId %in% c(11, 12) ~ 45,
+      kamerTypeId %in% c(13, 14, 15) ~ 55,
+      T ~ 60
+    ),
+    maxDuratieKamer = case_when(
+      kamerTypeId == 1 ~ 10,
+      kamerTypeId %in% c(2, 3) ~ 15,
+      kamerTypeId %in% c(4, 5) ~ 17,
+      kamerTypeId %in% c(6, 7) ~ 20,
+      kamerTypeId %in% c(8, 9, 10) ~ 35,
+      kamerTypeId %in% c(11, 12) ~ 60,
+      kamerTypeId %in% c(13, 14, 15) ~ 75,
+      T ~ 80
+    ),
+    maxDuratieMankement = case_when(
+      kamerTypeId %in% c(1, 2, 3) ~ 0,
+      kamerTypeId %in% c(4, 5) ~ 20,
+      kamerTypeId %in% c(6, 7) ~ 30,
+      kamerTypeId %in% c(8, 9, 10) ~ 15,
+      kamerTypeId %in% c(11, 12) ~ 30,
+      kamerTypeId %in% c(13, 14, 15) ~ 15,
+      T ~ 60
+    )
+  ) |>
+  select(
+    kamerId,
+    kamerTypeId,
+    kamerType,
+    volgendeVrijeDatumTijd,
+    minDuratieKamer,
+    maxDuratieKamer,
+    maxDuratieMankement
   )

@@ -124,7 +124,7 @@ Voordelen:
 
 > We gaan van events naar snapshots van die events
 
-#### fct_event
+#### event tabel
 - event_id
 - event_type
 - datumTijd
@@ -132,7 +132,7 @@ Voordelen:
 - kamer_id (nullable)
 - kamerType_id
 
-fct_event.eventTypes:
+event.eventTypes:
 
 patientEvents:
 
@@ -152,7 +152,7 @@ behandelkamerEvents:
 - StaffMetPauze
 - StaffOntslagGenomen
 
-fct_event.datumTijd: 
+event.datumTijd: 
 - alleen tijdstippen mogelijk tussen 9:00 en 21.00u, want alleen dan wordt er gewerkt. 
 - voor Behandelkamers geldt:
 	- receptieduur is 15 min. 
