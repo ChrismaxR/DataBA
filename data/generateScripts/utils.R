@@ -69,7 +69,7 @@ patientenStamTabel <- tibble::tibble(
   patientId = as.integer(seq(1, 16463, by = 1))
 ) |>
   mutate(
-    aprioriAandoeningId = sample(aandoening$id, n(), replace = TRUE),
+    aprioriAandoeningId = sample(aandoeningDimensies$id, n(), replace = TRUE),
     behandelRoute = case_when(
       aprioriAandoeningId %in% c(1:3) ~ "A",
       aprioriAandoeningId %in% c(4:7) ~ "B",
@@ -92,7 +92,7 @@ patientenStamTabel <- tibble::tibble(
       aprioriAandoeningId %in% c(33) ~ "S",
       TRUE ~ "Error"
     ),
-    diagnoseKamerId = case_when(
+    diagnoseKamerTypeId = case_when(
       behandelRoute %in% c("A", "B", "C", "D", "E") ~ 2L,
       behandelRoute %in% c("F", "G", "H", "I", "J") ~ 3L,
       behandelRoute %in% c("K") ~ 4L,
@@ -101,7 +101,7 @@ patientenStamTabel <- tibble::tibble(
       behandelRoute %in% c("R", "S") ~ 6L,
       TRUE ~ -1L
     ),
-    behandelKamerId = case_when(
+    behandelKamerTypeId = case_when(
       behandelRoute %in% c("A") ~ 8L,
       behandelRoute %in% c("B", "G", "N", "Q", "R") ~ 10L,
       behandelRoute %in% c("C", "H") ~ 18L,
@@ -116,14 +116,14 @@ patientenStamTabel <- tibble::tibble(
       behandelRoute %in% c("S") ~ 13L,
       TRUE ~ -1L
     ),
-    scenario = sample(
-      x = scenario,
+    patientScenario = sample(
+      x = scenarios,
       n(),
       replace = TRUE,
       prob = c(0.95, 0.05)
     ),
-    juisteDiagnoseKamerId = if_else(scenario == "foutieveDiagnose", 2, NULL)
-    juisteBehandelKamerId = if_else(scenario == "foutieveDiagnose", 8, NULL)
+    juisteDiagnoseKamerId = if_else(patientScenario == "foutieveDiagnose", 2L, NA_integer_),
+    juisteBehandelKamerId = if_else(patientScenario == "foutieveDiagnose", 8L, NA_integer_)
   )
 
 eventDimensies <- tibble::tibble(
@@ -248,12 +248,12 @@ kamerDimensies <- tibble::tibble(
       T ~ 60
     )
   ) |>
-  select(
+  transmute(
     kamerId,
     kamerTypeId,
     kamerType,
     volgendeVrijeDatumTijd,
-    minDuratieKamer,
-    maxDuratieKamer,
-    maxDuratieMankement
+    minDuratieKamer = as.integer(minDuratieKamer),
+    maxDuratieKamer = as.integer(maxDuratieKamer),
+    maxDuratieMankement = as.integer(maxDuratieMankement)
   )

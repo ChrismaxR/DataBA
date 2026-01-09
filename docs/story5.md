@@ -38,7 +38,7 @@ Er worden drie scenarios onderscheiden over wat een patient kan overkomen:
 
 | eventId  | eventType                   | datumTijd           | patientId  | kamerId  | kamerTypeId  |
 |----------|-----------------------------|---------------------|------------|----------|--------------|
-| 613      | aankomst                    | 2025-06-18 13:12:00 | 2865       | NULL     |  1           |
+| 613      | aankomst                    | 2025-06-18 13:12:00 | 2865       | NULL     |  NULL        |
 | 614      | inWachtrijReceptie          | 2025-06-18 13:12:00 | 2865       | NULL     |  1           |
 | 615      | inReceptie                  | 2025-06-18 13:24:00 | 2865       | 2        |  1           |
 | 616      | inWachtrijDiagnose          | 2025-06-18 13:36:00 | 2865       | NULL     |  2           |
@@ -125,13 +125,13 @@ Zie hieronder voor hoe deze situaties in de event-tabel eruit zouden moeten zien
 - code is van afdoende comments voorzien om uit te leggen wat de onderdelen in de code doen.
 - uitgangspunt is R's Tidyverse, tenzij base R of andere packages beter werken
 - ./data/generateScripts/utils.R bevat configuratie-informatie voor het genereren van de event data en dient gebruikt te worden: 
-    - scenarios = vector met mogelijke situaties die een patiënt kunnen treffen
-    - datum_vector = range van datums waarin patiëntbezoek plaatsvindt
-    - tijd_vector = range van tijdstippen waarin patiëntbezoeken op een dag plaatvinden
-    - kamerDimensies = configtabel voor receptie, diagnose- en behandelkamers, id's, 
-    - aandoeningDimensies = namen en id's van te behandelen aandoeningen
+    - scenarios -> vector met mogelijke situaties die een patiënt kunnen treffen
+    - datum_vector -> range van datums waarin patiëntbezoek plaatsvindt
+    - tijd_vector -> range van tijdstippen waarin patiëntbezoeken op een dag plaatvinden
+    - kamerDimensies -> configtabel voor receptie, diagnose- en behandelkamers, id's, 
+    - aandoeningDimensies -> namen en id's van te behandelen aandoeningen
     - eventDimensies -> Tabel dat de verschillende eventTypes, categorisering en Id's bepaalt voor de te genereren event-tabel. 
-    - patientenStamTabel = hier worden de patiënten geïnitialiseerd (id's), welke a priori behandeling ze hebben en welk kamers voor diagnose en behandeling dienen te worden aangedaan.
+    - patientenStamTabel -> hier worden de patiënten geïnitialiseerd (id's), welke a priori behandeling ze hebben en welk kamers voor diagnose en behandeling dienen te worden aangedaan.
 - de generator moet unieke oplopende eventId's per patiënt genereren.
 
 ## 📖 Validatie van events
@@ -149,6 +149,42 @@ De volgende checks moeten het nakomen van de eisen valideren:
 
 ## 📖 Data dictionary Configuratietabellen
 
+#### AandoeningDimensies
+| kolomnaam         | kolomOmschrijving                            | dataType     | nullable |
+|-------------------|----------------------------------------------|--------------|----------|
+| id                | Unieke id voor een event (PK)                | int          | F        |
+| aandoeningOmschrijving | omschrijving van een aandoening zoals deze in Theme Hospital voorkomt | string       | F        |
+
+
+#### kamerDimensies 
+| kolomnaam              | kolomOmschrijving                            | dataType     | nullable |
+|------------------------|----------------------------------------------|--------------|----------|
+| kamerId                | Unieke id voor een kamer (PK)                | int          | F        |
+| kamerTypeId            | Id voor een kamerType                        | int          | F        |
+| kamerType              | Omschrijving van kamer (diagnose, behandel)  | string       | F        |
+| volgendeVrijeDatumTijd | timestamp voor wanneer het volgende moment een kamerId vrij komt | dttm    | F        |
+| minDuratieKamer        | minimale duratie van een bezoek aan een kamer in hele minuten    | int          | F        |
+| maxDuratieKamer        | maximale duratie van een bezoek aan een kamer in hele minuten    | int          | F        |
+| maxDuratieMankement    | minimale duratie van het verhelpen van een mankementen in een kamer in hele minuten | int          | F        |
+
+#### patientenStamTabel 
+| kolomnaam              | kolomOmschrijving                            | dataType     | nullable |
+|------------------------|----------------------------------------------|--------------|----------|
+| patientId              | Unieke id voor een patient (PK)              | int          | F        |
+| aprioriAandoeningId    | Id voor een kamerType                        | int          | F        |
+| behandelRoute          | Categorisering van diagnose-behandelroute    | string       | F        |
+| diagnoseKamerTypeId    | vastlegging naar welke (diagnose)kamerType de patient dient aan te doen voor diens aandoening (FK) | int    | F        |
+| behandelKamerTypeId    | vastlegging naar welke (behandel)kamerType de patient dient aan te doen voor diens aandoening (FK)  | int          | F        |
+| patientScenario        | configuratie welk scenario een patiënt dient te doorlopen (happyFlow/foutieveDiagnose)  | string          | F        |
+| juisteDiagnoseKamerId  | als patientScenario == "foutieveDiagnose dan wordt hier geconfigureerd welk kamerType voor herdiagnose benodigd is (FK) | int          | T       |
+| juisteBehandelKamerId  | als patientScenario == "foutieveDiagnose dan wordt hier geconfigureerd welk kamerType voor herbehandeling benodigd is (FK) | int          | T       |
+
+#### eventDimensies 
+| kolomnaam              | kolomOmschrijving                            | dataType     | nullable |
+|------------------------|----------------------------------------------|--------------|----------|
+| id                     | Unieke id voor een eventDimensie (PK)        | int          | F        |
+| eventType              | Typering van welke mogelijke events in de te genereren event-tabel mogen komen  | string          | F        |
+| eventTypeCategorie     | Categorisering van types naar patiënt- en kamerevents  | string       | F        |
 
 
 ## 📖 Data dictionary Event tabel
