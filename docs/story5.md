@@ -198,3 +198,10 @@ De volgende checks moeten het nakomen van de eisen valideren:
 | patientId         | Id patient, niet uniek voor een event        | int          | T        |
 | kamerId           | Id voor een speciefieke kamer, niet uniek    | int          | T        |
 | kamerTypeId       | Id voor typeKamer, niet uniek                | int          | T        |
+
+## Simmer Implementatie
+
+
+### Achtergrond
+![](./png/simmer-logo.png){width=300px}
+simmer [website](https://r-simmer.org)
