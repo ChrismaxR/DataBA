@@ -88,7 +88,7 @@ Zie hieronder voor hoe deze situaties in de event-tabel eruit zouden moeten zien
 | 51737    | staffMetPauze      | 2025-11-22 16:30:00 | NULL       | 24       |  9           |
 | 51738    | vrij               | 2025-11-22 16:30:00 | NULL       | 24       |  9           |
 
-### kamerOnbeschikbaarheid - pauze neemt ontslag - eventType == "staffOntslagGenomen"
+### kamerOnbeschikbaarheid - personeel neemt ontslag - eventType == "staffOntslagGenomen"
 
 | eventId  | eventType           | datumTijd           | patientId  | kamerId  | kamerTypeId  |
 |----------|-------------------- |---------------------|------------|----------|--------------|

@@ -39,5 +39,6 @@ Theme Hospital • Wachttijden & Benutting dashboard
 - predictive modelling
 - seasonal influences on utilization and queue length
 - epidemic simulation
+- priority queueing - patiënten met een hogere prioriteit (zoals ongelukken en noodgevallen)
 - multiple stakeholders with conflicting interests
 - scenarios bouwen: wat als we meer kamers hadden gehad/meer patiënten te verstouwen hadden gehad, enz.
