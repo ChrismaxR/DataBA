@@ -201,7 +201,18 @@ De volgende checks moeten het nakomen van de eisen valideren:
 
 ## Simmer Implementatie
 
-
 ### Achtergrond
 ![](./png/simmer-logo.png){width=300px}
 simmer [website](https://r-simmer.org)
+
+### Feature branch - simmerImplementation
+
+stap 1 - minimale werking in simmer + check op metrieken voor wachttijden + benutting
+stap 2 - arrival tijden tweaken om stochastiche aankomsttijden te kunnen behalen + omzetten naar datumTijden
+stap 3 - trajectory aanpassen aan bestaande kamers
+stap 4 - koppeling patientenStamTabel aan arrivals maken - apriori ziektebeeld naar behandelpad
+stap 5 - opnieuw check op metrieken berekenen - kan ik ook per aandoening, kamerType en kamerId berekeningen maken
+stap 6 - arrivals en trajectories rekening houden met openingstijden van ziekenhuis?
+stap 7 - machine breakdown inbouwen - branch() in trajectory
+stap 8 - onbeschikbaarheid kamer door pauzes/vacatures?
+stap 9 - volgende check op metrieken - nog steeds wachttijden en benutting mogelijk? Heb ik ook tijden van onbeschikbaarheid en kan ik breakdown maken?
