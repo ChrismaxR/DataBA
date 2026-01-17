@@ -6,7 +6,7 @@ library(dplyr)
 
 set.seed(42)
 
-# helpers
+# helperfuncties
 
 sim_origin <- as.POSIXct("2025-01-01 09:00:00", tz = "UTC")
 
@@ -48,20 +48,26 @@ env |>
     run(until = 8 * 60) # 2 uur simulatie
 
 # 4) Monitoring: wie zat wanneer op welke resource
-mon <- get_mon_arrivals(env, per_resource = TRUE)
+events <- get_mon_arrivals(env, per_resource = TRUE)
+
+## deze
 mon_resources <- get_mon_resources(env)
 attr_mon <- get_mon_attributes(env)
 
-# 5) Jouw event-achtig formaat: start = inGebruik, end = vrij
-service_events <- mon |>
-    filter(name == "patient10") |>
+# 5) Ombouwen van monitoring data naar event tabel
+# NB get_mon_arrivals() geeft niet direct een queue time, dit moet ik berekenen:
+# waiting_time_next_event = end_time_this_event - (start_time_this_event + activity_time_this_event)
+events <- events |>
+    #filter(name == "patient10") |>
     transmute(
         name,
         resource,
-        start_time,
-        activity_time,
-        release_time = start_time + activity_time,
-        wait_time_next_resource = end_time - release_time,
+        start_time_this_event = start_time,
+        activity_time_this_event = activity_time,
+        end_time_this_event = end_time,
+        release_time_this_event = start_time_this_event +
+            activity_time_this_event,
+        wait_time_next_resource = end_time_this_event - release_time_this_event,
         seize_time_next_resource = end_time
         #patientId = as.integer(gsub("\\D+", "", name)),
         #kamerType = resource,
@@ -70,6 +76,5 @@ service_events <- mon |>
         #activity_time = difftime(end_dt, start_dt, units = "mins"),
         #eventType = "inGebruik"
     ) |>
+    # maak tabel long
     tidyr::pivot_longer(cols = 3:7, names_repair = "minimal")
-
-mon_resources
