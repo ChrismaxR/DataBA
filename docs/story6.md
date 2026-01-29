@@ -80,3 +80,9 @@ data/generateScripts/simmer/simmerImplementatie.R
 | stap 8 | onbeschikbaarheid kamer door pauzes/vacatures?. | 🕘 |
 | stap 9 | volgende check op metrieken - nog steeds wachttijden en benutting mogelijk? Heb ik ook tijden van onbeschikbaarheid en kan ik breakdown maken? | 🕘 |
 | stap 10 | configurabele simulatieparameters maken, zodat ik simulatie beter kan tweaken | 🕘 |
+
+## Configurabele elementen aan simmer script 
+
+- Resources per kamerType -> nu geconfigureerd in add_resource functies in de `env`: capaciteit en queue_size. 
+- Trajectories die een patient doorloopt (oftewel scenarios)
+- Duraties bij bezoek aan recepties, diagnose- en behandelkamers in timeout functies in de diverse `trajectories`
