@@ -1,3 +1,6 @@
+# Uitproberen van de simmer package om een beetje te begrijpen hoe dit deze werkt.
+# Dient als input voor simmerImplementatie.R
+
 library(simmer)
 env <- simmer()
 
