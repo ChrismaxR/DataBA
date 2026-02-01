@@ -9,8 +9,8 @@ source("data/generateScripts/simmer/simmerImplementatie.R")
 
 simOrigin <- as.POSIXct("2025-01-01 09:00:00", tz = "UTC")
 
-to_datetime <- function(t_minutes) {
-  simOrigin + as.difftime(t_minutes, units = "mins")
+to_datetime <- function(timeMinutes) {
+  simOrigin + as.difftime(timeMinutes, units = "mins")
 }
 
 # Wrangle data -------------
