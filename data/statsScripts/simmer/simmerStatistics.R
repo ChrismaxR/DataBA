@@ -3,6 +3,7 @@
 
 library("tidyverse")
 library("patchwork")
+source("data/generateScripts/simmer/simmerConfig.R")
 source("data/generateScripts/simmer/simmerImplementatie.R")
 
 # helperfuncties --------------
@@ -21,13 +22,7 @@ events_wrangle <- events |>
     waitTime = (endTime - activityTime) - startTime, # is dit de juiste berekening?
     resource = factor(
       resource,
-      levels = c(
-        "Receptie",
-        "GP's office",
-        "General Diagnosis Room",
-        "The Ward",
-        "Slack Tongue Clinic"
-      )
+      levels = resource_definitie$resourceName
     ),
     startTimeReal = to_datetime(startTime),
     endTimeReal = to_datetime(endTime),
@@ -133,18 +128,18 @@ tabel_benutting <- events_wrangle |>
     sumWaitTime = sum(waitTime),
     sumActivityTime = sum(activityTime)
   ) |>
+  left_join(
+    resource_definitie |>
+      transmute(resource = resourceName, capacity),
+    by = "resource"
+  ) |>
   mutate(
-    potentialActivityTime = case_when(
-      # per resource de duur vermenigvuldigen met de beschikbare capaciteit
-      resource == "Receptie" ~ receptieCapaciteit * simDuration,
-      resource == "GP's office" ~ gpOfficeCapaciteit * simDuration,
-      resource == "General Diagnosis Room" ~ generalDiagnosisCapaciteit *
-        simDuration,
-      resource == "The Ward" ~ wardCapaciteit * simDuration,
-      resource == "Slack Tongue Clinic" ~ slackTongueCapaciteit * simDuration,
-      T ~ -1
-    ),
-    utilization = sumActivityTime / potentialActivityTime
+    potentialActivityTime = capacity * simDuration,
+    utilization = if_else(
+      potentialActivityTime > 0,
+      sumActivityTime / potentialActivityTime,
+      NA_real_
+    )
   )
 
 barplot_benutting <- tabel_benutting |>

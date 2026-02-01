@@ -122,8 +122,16 @@ patientenStamTabel <- tibble::tibble(
       replace = TRUE,
       prob = c(0.95, 0.05)
     ),
-    juisteDiagnoseKamerId = if_else(patientScenario == "foutieveDiagnose", 2L, NA_integer_),
-    juisteBehandelKamerId = if_else(patientScenario == "foutieveDiagnose", 8L, NA_integer_)
+    juisteDiagnoseKamerId = if_else(
+      patientScenario == "foutieveDiagnose",
+      2L,
+      NA_integer_
+    ),
+    juisteBehandelKamerId = if_else(
+      patientScenario == "foutieveDiagnose",
+      8L,
+      NA_integer_
+    )
   )
 
 eventDimensies <- tibble::tibble(
