@@ -19,7 +19,9 @@ to_datetime <- function(timeMinutes) {
 # plus daadwerkelijke tijdstippen maken m.b.v. helper uit
 events_wrangle <- events |>
   mutate(
-    waitTime = (endTime - activityTime) - startTime, # is dit de juiste berekening?
+    # waitTime = tijd in de wachtrij = totale verblijfstijd bij resource minus daadwerkelijke behandeltijd
+    # (endTime - startTime) geeft de totale tijd, activityTime is de diensttijd -> verschil is wachttijd
+    waitTime = (endTime - activityTime) - startTime,
     resource = factor(
       resource,
       levels = resource_definitie$resourceName
@@ -146,7 +148,8 @@ tabel_benutting <- events_wrangle |>
     by = "resource"
   ) |>
   mutate(
-    potentialActivityTime = capacity * simDuration,
+    # Noemer = enkel de werkuren dat een resource beschikbaar is (niet 24/7)
+    potentialActivityTime = capacity * simDays * workDayMinutes,
     utilization = if_else(
       potentialActivityTime > 0,
       sumActivityTime / potentialActivityTime,
