@@ -71,15 +71,15 @@ data/generateScripts/simmer/simmerImplementatie.R
 | stap | omschrijving | status |
 |------|--------------|--------|
 | stap 1 | minimale werking in simmer + check op metrieken voor wachttijden + benutting. | ✅ |
-| stap 2 | trajectory aanpassen aan bestaande kamers. | 🕘 |
+| stap 2 | trajectory aanpassen aan bestaande kamers. | ✅ |
 | stap 3 | arrival tijden tweaken om stochastiche aankomsttijden te kunnen behalen + omzetten naar datumTijden. | 🕘 |
-| stap 4 | koppeling patientenStamTabel aan arrivals maken - apriori ziektebeeld naar behandelpad. | 🕘 |
+| stap 4 | koppeling patientenStamTabel aan arrivals maken - apriori ziektebeeld naar behandelpad. | ✅ |
 | stap 5 | opnieuw check op metrieken berekenen - kan ik ook per aandoening, kamerType en kamerId berekeningen maken. | 🕘 |
-| stap 6 | arrivals en trajectories rekening houden met openingstijden van ziekenhuis?. | 🕘 |
+| stap 6 | arrivals en trajectories rekening houden met openingstijden van ziekenhuis? | ✅ |
 | stap 7 | machine breakdown inbouwen - branch() in trajectory. | 🕘 |
 | stap 8 | onbeschikbaarheid kamer door pauzes/vacatures?. | 🕘 |
 | stap 9 | volgende check op metrieken - nog steeds wachttijden en benutting mogelijk? Heb ik ook tijden van onbeschikbaarheid en kan ik breakdown maken? | 🕘 |
-| stap 10 | configurabele simulatieparameters maken, zodat ik simulatie beter kan tweaken | 🕘 |
+| stap 10 | configurabele simulatieparameters maken, zodat ik simulatie beter kan tweaken | 🕘/✅ |
 
 ## Configurabele elementen aan simmer script 
 

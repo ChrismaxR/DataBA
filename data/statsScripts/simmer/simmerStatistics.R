@@ -26,6 +26,8 @@ events_wrangle <- events |>
     ),
     startTimeReal = to_datetime(startTime),
     endTimeReal = to_datetime(endTime),
+    startTimeMonth = month(startTimeReal, label = T),
+    endTimeMonth = month(endTimeReal, label = T)
   )
 
 # In de log_() functie kan ik allemaal eigenschappen van patienten kwijt
@@ -37,7 +39,8 @@ patientAttributes <- log_df |>
     type = str_trim(str_extract(message, "^[^=]+")),
     value = str_extract(message, "(?<=\\=\\s).*")
   ) |>
-  pivot_wider(names_from = type, values_from = value)
+  pivot_wider(names_from = type, values_from = value) |>
+  left_join(aandoeningDimensies, by = c("aandoeningId" = "id"))
 
 log_aankomst_ontslag <- log_df |>
   filter(message %in% c("aankomstTijdstip", "ontslagTijdstip")) |>
@@ -47,7 +50,11 @@ log_aankomst_ontslag <- log_df |>
       !is.na(ontslagTijdstip),
       ontslagTijdstip - aankomstTijdstip,
       NA_real_
-    )
+    ),
+    aankomstTijdstipReal = to_datetime(aankomstTijdstip),
+    ontslagTijdstipReal = to_datetime(ontslagTijdstip),
+    aankomstTijdstipMonth = month(aankomstTijdstipReal, label = T),
+    ontstlagTijdstipMonth = month(ontslagTijdstipReal, label = T)
   ) |>
   rename(patient = 1) |>
   left_join(patientAttributes, by = "patient")
@@ -69,24 +76,28 @@ events_wrangle |>
 # Hoe zien aankomst tijdstippen er uit?
 histogram_aankomsttijden <- events_wrangle |>
   #filter(resource == "Receptie") |>
-  ggplot(aes(
-    x = startTimeReal,
-    fill = fct_rev(fct_inorder(resource))
-  )) +
-  geom_histogram() +
-  scale_x_datetime() +
+  ggplot(
+    aes(
+      x = hms::as_hms(startTimeReal),
+      fill = fct_rev(fct_inorder(resource))
+    ),
+    colour = "white"
+  ) +
+  geom_histogram(bins = 50) +
+  #scale_x_datetime() +
   labs(
     title = "Verdeling Aankomsten per kamerType van patiënten in mijn simulatie",
     subtitle = "",
     y = "Aankomsten patiënten",
+    x = "Aanvangstijdstip kamer",
     fill = "Kamer"
   )
 
 # Hoe ziet de verdeling van behandeltijden per kamerType eruit?
 boxplot_behandeltijden <- events_wrangle |>
   ggplot(aes(
-    x = fct_infreq(resource),
-    y = activityTime,
+    y = fct_infreq(resource),
+    x = activityTime,
     fill = resource
   )) +
   geom_boxplot() +
@@ -102,13 +113,14 @@ boxplot_behandeltijden <- events_wrangle |>
 # Hoe ziet de verdeling van wachttijden per kamerType eruit?
 boxplot_wachttijden <- events_wrangle |>
   ggplot(aes(
-    x = forcats::fct_infreq(resource),
-    y = waitTime,
+    y = forcats::fct_infreq(resource),
+    x = waitTime,
     fill = resource
   )) +
   geom_boxplot() +
   geom_jitter(alpha = .6, width = .2, height = 0) +
   theme(legend.position = "none") +
+  #scale_x_log10() +
   labs(
     title = "Verdeling wachttijden per kamerType",
     #subtitle = "",
@@ -184,8 +196,8 @@ barplot_ontslag <- log_aankomst_ontslag |>
       "ontslagen"
     )
   ) |>
-  count(isOntslagen, aandoeningId) |>
-  ggplot(aes(x = isOntslagen, y = n, fill = aandoeningId)) +
+  count(isOntslagen, aandoeningOmschrijving) |>
+  ggplot(aes(x = isOntslagen, y = n, fill = aandoeningOmschrijving)) +
   geom_col() +
   labs(
     title = "Verdeling patienten die ontslagen zijn gedurende de dag",
@@ -213,17 +225,3 @@ rapport <- histogram_aankomsttijden +
   barplot_benutting +
   barplot_ontslag +
   histogram_duratie_in_ziekenhuis
-
-filename <- str_c(
-  str_remove_all(as.character(Sys.Date()), "\\-"),
-  "_simulatie_performance.png"
-)
-
-ggsave(
-  plot = rapport,
-  filename = filename,
-  device = "png",
-  path = "data/statsScripts/simmer/rapporten",
-  width = 20,
-  height = 18
-)

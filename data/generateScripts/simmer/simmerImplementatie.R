@@ -315,8 +315,13 @@ log_df <- tibble::tibble(
 
 # 5) Monitoring -------------
 events <- get_mon_arrivals(env, per_resource = TRUE) |>
-    janitor::clean_names(case = "small_camel")
+    janitor::clean_names(case = "small_camel") |>
+    tibble()
 attributes <- get_mon_attributes(env) |>
-    janitor::clean_names(case = "small_camel")
+    janitor::clean_names(case = "small_camel") |>
+    tibble()
 resources <- get_mon_resources(env) |>
-    janitor::clean_names(case = "small_camel")
+    janitor::clean_names(case = "small_camel") |>
+    tibble()
+
+# 6) Output to csv files (for uploading to evidence.studio)

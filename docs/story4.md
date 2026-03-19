@@ -75,7 +75,7 @@ Hier volgt ook uit een aantal scenarios die ik op kan zetten die een gemeenschap
 
 ### 📊 Conceptuele metrieken in relatie tot het analytische datamodel
 
-|  id | onderwerp  | operationalisatie                       | psuedoCode                                                                       | inDataModel? |
+|  id | onderwerp  | operationalisatie                       | pseudoCode                                                                       | inDataModel? |
 |-----|------------|-----------------------------------------|----------------------------------------------------------------------------------|--------------|
 |   1 | Capaciteit |  # potentiële te benutten behandelkamers| count(fct_kamer.id) where fct_kamer.kamerStatus == "InGebruik"                   |  True        |
 |   2 | Capaciteit |  # behandelkamers met kapotte mach.     | count(fct_kamer.id) where fct_kamer.kamerStatus == "MachineKapot"                |  True        |
