@@ -1,0 +1,17 @@
+.gitignore
+.DS_Store
+recourses/discrete-event-system-simulation-jerry-banks_2.pdf
+docs/png/codeBranchWorkflow.png
+recourses/Discrete Event System Simulation - Jerry Banks.pdf
+recourses/Simulation modelling and analysis - Averill Law.pdf
+/output
+
+# Evidence.dev / Node
+node_modules
+.svelte-kit
+build
+.evidence/template
+.evidence/meta
+static/data
+*.options.yaml
+.env
