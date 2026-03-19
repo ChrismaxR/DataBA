@@ -1,0 +1,7 @@
+# This file was automatically generated
+type: duckdb
+name: hospital
+options:
+  filename: ':memory:'
+buildOptions:
+  batchSize: 1000000
