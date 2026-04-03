@@ -2,13 +2,14 @@
 title: Theme Hospital — Overzicht
 ---
 
+
 ```sql kpi
 SELECT
   COUNT(DISTINCT patient)                           AS n_patienten,
   SUM(CASE WHEN NOT isOntslagen THEN 1 ELSE 0 END)  AS n_wachtenden,
   ROUND(AVG(waitTime), 1)                           AS gem_wachttijd
 FROM hospital.patienten p
-LEFT JOIN hospital.events e USING (patient)
+LEFT JOIN hospital.events e ON p.patient = e.name
 ```
 
 ```sql toeloop_per_dag

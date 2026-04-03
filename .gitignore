@@ -10,8 +10,8 @@ recourses/Simulation modelling and analysis - Averill Law.pdf
 node_modules
 .svelte-kit
 build
-.evidence/template
-.evidence/meta
+**/.evidence/template
+**/.evidence/meta
 static/data
 *.options.yaml
 .env
