@@ -3,7 +3,7 @@
 ## Duratie van de simulatie - je geeft het in minuten op.
 dayMinutes <- 24 * 60
 workDayMinutes <- 8 * 60
-simDays <- 5
+simDays <- 62
 simDuration <- simDays * dayMinutes
 
 ## Simulatieresources - hoeveelheid servers/kamers dat elke resource heeft.
@@ -53,26 +53,26 @@ resource_definitie <- data.frame(
     "Decontamination"
   ),
   capacity = c(
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5
+    3,
+    3,
+    1,
+    1,
+    4,
+    3,
+    2,
+    1,
+    1,
+    2,
+    2,
+    1,
+    1,
+    3,
+    2,
+    3,
+    1,
+    2,
+    1,
+    1
   ),
   stringsAsFactors = FALSE
 )
@@ -89,7 +89,7 @@ slackTongueCapaciteit <- resource_definitie$capacity[
 
 ## Distributie/tempo waarmee nieuwe aankomsten van patienten worden gegenereerd
 ### Nu minimaal na 1 minuut, maximaal binnen 5 minuten.
-aankomstDistributie <- function() runif(n = 1, min = 1, max = 5)
+aankomstDistributie <- function() rexp(n = 1, rate = 1 / 3)
 
 ## Duraties van de behandeling van de verschillende resources
 receptieTimeoutDuratie <- function() runif(1, 5, 10)

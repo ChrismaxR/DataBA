@@ -49,7 +49,12 @@ resource_timeout <- function(resource_id) {
     min_dur <- duration_row$min[1]
     max_dur <- duration_row$max[1]
 
-    function() runif(1, min_dur, max_dur)
+    function() {
+        mean_dur <- (min_dur + max_dur) / 2
+        sdlog <- 0.3
+        meanlog <- log(mean_dur) - sdlog^2 / 2
+        rlnorm(1, meanlog, sdlog)
+    }
 }
 
 maak_work_schedule <- function(capacity) {

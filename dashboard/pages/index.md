@@ -36,6 +36,7 @@ LIMIT 10
     data={kpi}
     value=n_patienten
     title="Nieuwe patiënten"
+    fmt=num0
   />
   <BigValue
     data={kpi}
@@ -49,23 +50,23 @@ LIMIT 10
   />
 </Grid>
 
-<Grid cols=2>
-  <BarChart
-    data={toeloop_per_dag}
-    x=simDag
-    y=n_patienten
-    title="Patiëntentoeloop per simulatiedag"
-    xAxisTitle="Dag"
-    yAxisTitle="Aantal patiënten"
-  />
 
-  <BarChart
-    data={top_wachttijd}
-    x=resource
-    y=gem_wachttijd
-    swapXY=true
-    title="Gem. wachttijd per kamertype (top 10)"
-    xAxisTitle="Gem. wachttijd (min)"
-    yAxisTitle=null
-  />
-</Grid>
+<BarChart
+  data={toeloop_per_dag}
+  x=simDag
+  y=n_patienten
+  title="Patiëntentoeloop per simulatiedag"
+  xAxisTitle="Dag"
+  yAxisTitle="Aantal patiënten"
+/>
+
+<BarChart
+  data={top_wachttijd}
+  x=resource
+  y=gem_wachttijd
+  swapXY=true
+  title="Gem. wachttijd per kamertype (top 10)"
+  xAxisTitle="Gem. wachttijd (min)"
+  yAxisTitle=null
+/>
+

@@ -2,53 +2,44 @@
 title: Capaciteit
 ---
 
-```sql kpi_capaciteit
-SELECT
-  COUNT(*)                            AS n_kamertypen,
-  ROUND(AVG(utilization) * 100, 1)   AS gem_benutting_pct,
-  ROUND(MAX(utilization) * 100, 1)   AS max_benutting_pct
+```sql benutting
+SELECT *
 FROM hospital.benutting
 ```
 
-```sql benutting_per_kamer
-SELECT
-  resource,
-  capacity,
-  ROUND(sumActivityTime, 0)           AS sumActivityTime,
-  ROUND(utilization * 100, 1)         AS benutting_pct
+```sql maxbenutting
+SELECT 
+    max(utilization) as max, 
+    avg(utilization) as avg
 FROM hospital.benutting
-ORDER BY utilization DESC
 ```
 
-<Grid cols=3>
+
+<Grid cols=2>
   <BigValue
-    data={kpi_capaciteit}
-    value=n_kamertypen
-    title="Kamertypen"
-  />
-  <BigValue
-    data={kpi_capaciteit}
-    value=gem_benutting_pct
+    data={maxbenutting}
+    value=avg
     title="Gem. benutting (%)"
-    fmt=num1
+    fmt=pct
   />
   <BigValue
-    data={kpi_capaciteit}
-    value=max_benutting_pct
+    data={maxbenutting}
+    value=max
     title="Hoogste benutting (%)"
-    fmt=num1
+    fmt=pct
   />
 </Grid>
 
 <BarChart
-  data={benutting_per_kamer}
+  data={benutting}
   x=resource
-  y=benutting_pct
+  y=utilization
   swapXY=true
   title="Benutting per kamertype (% van beschikbare capaciteit in werkuren)"
   xAxisTitle="Benutting (%)"
-  yAxisTitle=null
+  yAxisTitle="% Benutting"
+  yFmt=pct
   colorPalette={['#27ae60', '#f39c12', '#e74c3c']}
 />
 
-<DataTable data={benutting_per_kamer} title="Benutting per kamertype" />
+<DataTable data={benutting} title="Benutting" />

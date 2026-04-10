@@ -52,15 +52,16 @@ ORDER BY simDag
 </Grid>
 
 <BarChart
-  data={aandoeningen}
-  x=aandoeningOmschrijving
+  data={toeloop_per_dag}
+  x=simDag
   y={['ontslagen', 'nog_aanwezig']}
-  swapXY=true
   type=stacked
-  title="Patiënten per aandoening"
-  xAxisTitle="Aantal patiënten"
-  yAxisTitle=null
+  title="Dagverloop: ontslagen vs. nog aanwezig"
+  xAxisTitle="Dag"
+  yAxisTitle="Aantal patiënten"
 />
+
+
 
 <Grid cols=2>
   <BarChart
@@ -74,12 +75,14 @@ ORDER BY simDag
   />
 
   <BarChart
-    data={toeloop_per_dag}
-    x=simDag
+    data={aandoeningen}
+    x=aandoeningOmschrijving
     y={['ontslagen', 'nog_aanwezig']}
+    swapXY=true
     type=stacked
-    title="Dagverloop: ontslagen vs. nog aanwezig"
-    xAxisTitle="Dag"
-    yAxisTitle="Aantal patiënten"
+    title="Patiënten per aandoening"
+    xAxisTitle="Aantal patiënten"
+    yAxisTitle=null
   />
+
 </Grid>

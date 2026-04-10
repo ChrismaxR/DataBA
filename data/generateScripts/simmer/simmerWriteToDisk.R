@@ -1,4 +1,5 @@
 source("data/statsScripts/simmer/simmerStatistics.R")
+run_date <- Sys.Date()
 
 # Visueel rapport naar disk ------------------
 rapportFileName <- str_c(
@@ -24,7 +25,7 @@ eventsWrangleFilename <- str_c(
 )
 
 write_csv(
-  x = events_wrangle,
+  x = events_wrangle |> mutate(run = run_date),
   file = str_c(here::here("output"), "/", eventsWrangleFilename),
   col_names = T
 )
@@ -36,7 +37,7 @@ tabelBenuttingFilename <- str_c(
 )
 
 write_csv(
-  x = tabel_benutting,
+  x = tabel_benutting |> mutate(run = run_date),
   file = str_c(here::here("output"), "/", tabelBenuttingFilename),
   col_names = T
 )
@@ -48,7 +49,7 @@ logAankomstOntslagFilename <- str_c(
 )
 
 write_csv(
-  x = log_aankomst_ontslag,
+  x = log_aankomst_ontslag |> mutate(run = run_date),
   file = str_c(here::here("output"), "/", logAankomstOntslagFilename),
   col_names = T
 )
