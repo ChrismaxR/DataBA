@@ -8,8 +8,27 @@ set.seed(42)
 # configuratiesettings -------
 source("data/generateScripts/simmer/simmerConfig.R")
 
-# Override zodat alle aandoeningen meedoen in deze simulatie.
-aandoeningBepaling <- function() sample(x = 1L:33L, size = 1, replace = TRUE)
+# Gedeelde helper: zoek de huidige waarde op in een tijdschema op basis van now(env)
+schema_opzoeken <- function(schema, kolom) {
+    dag <- now(env) / dayMinutes
+    rij <- max(which(schema$dag_van <= dag))
+    schema[[kolom]][rij]
+}
+
+# Tijdsafhankelijke aandoeningsbepaling: epidemie als bellcurve, rest uniform
+aandoeningBepaling <- function() {
+    dag <- now(env) / dayMinutes
+    gewichten <- rep(1, 33)
+    gewichten[epidemie_aandoening_id] <- 1 +
+        (epidemie_piek_gewicht - 1) *
+            exp(-0.5 * ((dag - epidemie_piek_dag) / epidemie_sd_dagen)^2)
+    sample(1L:33L, size = 1, prob = gewichten / sum(gewichten))
+}
+
+# Tijdsafhankelijke aankomstdistributie: rate per kwartaal uit aankomst_schema
+aankomstDistributie <- function() {
+    rexp(1, rate = schema_opzoeken(aankomst_schema, "rate"))
+}
 
 # 1) Simulatie-omgeving + resources ----------
 resource_map <- setNames(resource_definitie$resourceName, resource_definitie$id)
@@ -50,7 +69,8 @@ resource_timeout <- function(resource_id) {
     max_dur <- duration_row$max[1]
 
     function() {
-        mean_dur <- (min_dur + max_dur) / 2
+        mul <- schema_opzoeken(service_schema, "multiplier")
+        mean_dur <- (min_dur + max_dur) / 2 * mul
         sdlog <- 0.3
         meanlog <- log(mean_dur) - sdlog^2 / 2
         rlnorm(1, meanlog, sdlog)
@@ -136,6 +156,31 @@ env <- Reduce(
     seq_len(nrow(resource_definitie)),
     init = simmer("hospital")
 )
+
+# 1b) Capaciteitsmanager: pas kamercapaciteit aan op geplande dagen ----------
+maak_cap_generator <- function(res_naam, schema_res) {
+    traj <- trajectory(paste0("cap_", res_naam)) |>
+        set_capacity(
+            res_naam,
+            value = function() {
+                dag <- round(now(env) / dayMinutes)
+                schema_res$nieuwe_cap[which.min(abs(schema_res$dag - dag))]
+            }
+        )
+    add_generator(
+        env,
+        name_prefix = paste0("cap_", res_naam, "_"),
+        trajectory = traj,
+        distribution = at(schema_res$dag * dayMinutes)
+    )
+}
+
+for (res_naam in unique(capaciteit_schema$resourceName)) {
+    env <- maak_cap_generator(
+        res_naam,
+        capaciteit_schema[capaciteit_schema$resourceName == res_naam, ]
+    )
+}
 
 # 2) Patient subtrajectories ------------
 
@@ -329,4 +374,50 @@ resources <- get_mon_resources(env) |>
     janitor::clean_names(case = "small_camel") |>
     tibble()
 
-# 6) Output to csv files (for uploading to evidence.studio)
+# 6) Wrangle data -------------
+# waitTime berekenen (maar nog niet zeker of dit de juiste manier is), factor maken van resources
+# plus daadwerkelijke tijdstippen maken m.b.v. helper uit
+
+events_wrangle <- events |>
+    mutate(
+        # waitTime = tijd in de wachtrij = totale verblijfstijd bij resource minus daadwerkelijke behandeltijd
+        # (endTime - startTime) geeft de totale tijd, activityTime is de diensttijd -> verschil is wachttijd
+        waitTime = (endTime - activityTime) - startTime,
+        resource = factor(
+            resource,
+            levels = resource_definitie$resourceName
+        ),
+        startTimeReal = to_datetime(startTime),
+        endTimeReal = to_datetime(endTime),
+        startTimeMonth = month(startTimeReal, label = T),
+        endTimeMonth = month(endTimeReal, label = T)
+    )
+
+# In de log_() functie kan ik allemaal eigenschappen van patienten kwijt
+# als ik dat doet met de vorm "eigenschap = nummeriekeWaarde", dan kan ik deze eenvoudig in deze tibble kwijt.
+patientAttributes <- log_df |>
+    filter(str_detect(message, "^aandoeningId")) |>
+    transmute(
+        patient = arrival,
+        type = str_trim(str_extract(message, "^[^=]+")),
+        value = str_extract(message, "(?<=\\=\\s).*")
+    ) |>
+    pivot_wider(names_from = type, values_from = value) |>
+    left_join(aandoeningDimensies, by = c("aandoeningId" = "id"))
+
+log_aankomst_ontslag <- log_df |>
+    filter(message %in% c("aankomstTijdstip", "ontslagTijdstip")) |>
+    pivot_wider(names_from = message, values_from = time) |>
+    mutate(
+        duratieInZiekenhuis = if_else(
+            !is.na(ontslagTijdstip),
+            ontslagTijdstip - aankomstTijdstip,
+            NA_real_
+        ),
+        aankomstTijdstipReal = to_datetime(aankomstTijdstip),
+        ontslagTijdstipReal = to_datetime(ontslagTijdstip),
+        aankomstTijdstipMonth = month(aankomstTijdstipReal, label = T),
+        ontstlagTijdstipMonth = month(ontslagTijdstipReal, label = T)
+    ) |>
+    rename(patient = 1) |>
+    left_join(patientAttributes, by = "patient")

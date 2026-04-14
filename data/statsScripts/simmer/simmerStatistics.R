@@ -3,63 +3,26 @@
 
 library("tidyverse")
 library("patchwork")
+
+tictoc::tic()
 source("data/generateScripts/simmer/simmerConfig.R")
 source("data/generateScripts/simmer/simmerImplementatie.R")
+tictoc::toc()
 
-# helperfuncties --------------
+glimpse(events_wrangle)
 
-simOrigin <- as.POSIXct("2025-01-01 09:00:00", tz = "UTC")
-
-to_datetime <- function(timeMinutes) {
-  simOrigin + as.difftime(timeMinutes, units = "mins")
-}
-
-# Wrangle data -------------
-# waitTime berekenen (maar nog niet zeker of dit de juiste manier is), factor maken van resources
-# plus daadwerkelijke tijdstippen maken m.b.v. helper uit
-events_wrangle <- events |>
-  mutate(
-    # waitTime = tijd in de wachtrij = totale verblijfstijd bij resource minus daadwerkelijke behandeltijd
-    # (endTime - startTime) geeft de totale tijd, activityTime is de diensttijd -> verschil is wachttijd
-    waitTime = (endTime - activityTime) - startTime,
-    resource = factor(
-      resource,
-      levels = resource_definitie$resourceName
-    ),
-    startTimeReal = to_datetime(startTime),
-    endTimeReal = to_datetime(endTime),
-    startTimeMonth = month(startTimeReal, label = T),
-    endTimeMonth = month(endTimeReal, label = T)
+events_wrangle |> 
+  ##group_by(startTimeMonth) |> 
+  summarise(
+    patienten = n_distinct(name)
   )
 
-# In de log_() functie kan ik allemaal eigenschappen van patienten kwijt
-# als ik dat doet met de vorm "eigenschap = nummeriekeWaarde", dan kan ik deze eenvoudig in deze tibble kwijt.
-patientAttributes <- log_df |>
-  filter(str_detect(message, "^aandoeningId")) |>
-  transmute(
-    patient = arrival,
-    type = str_trim(str_extract(message, "^[^=]+")),
-    value = str_extract(message, "(?<=\\=\\s).*")
-  ) |>
-  pivot_wider(names_from = type, values_from = value) |>
-  left_join(aandoeningDimensies, by = c("aandoeningId" = "id"))
+log_aankomst_ontslag |> 
+  ##group_by(aankomstTijdstipMonth) |> 
+    summarise(
+      patienten = n_distinct(patient)
+    )
 
-log_aankomst_ontslag <- log_df |>
-  filter(message %in% c("aankomstTijdstip", "ontslagTijdstip")) |>
-  pivot_wider(names_from = message, values_from = time) |>
-  mutate(
-    duratieInZiekenhuis = if_else(
-      !is.na(ontslagTijdstip),
-      ontslagTijdstip - aankomstTijdstip,
-      NA_real_
-    ),
-    aankomstTijdstipReal = to_datetime(aankomstTijdstip),
-    ontslagTijdstipReal = to_datetime(ontslagTijdstip),
-    aankomstTijdstipMonth = month(aankomstTijdstipReal, label = T),
-    ontstlagTijdstipMonth = month(ontslagTijdstipReal, label = T)
-  ) |>
-  rename(patient = 1) |>
-  left_join(patientAttributes, by = "patient")
 
 # Wat wil ik berekenen?  ----------------
 
@@ -103,13 +66,13 @@ boxplot_behandeltijden <- events_wrangle |>
     fill = resource
   )) +
   geom_boxplot() +
-  geom_jitter(alpha = .6, width = .2, height = 0) +
+  geom_jitter(alpha = .6, width = .5, height = 0) +
   theme(legend.position = "none") +
   labs(
     title = "Verdeling behandeltijden per kamerType",
     #subtitle = "",
-    y = "Behandeltijd in minuten",
-    x = NULL
+    x = "Behandeltijd in minuten",
+    y = NULL
   )
 
 # Hoe ziet de verdeling van wachttijden per kamerType eruit?
@@ -121,15 +84,31 @@ boxplot_wachttijden <- events_wrangle |>
   )) +
   geom_boxplot() +
   geom_jitter(alpha = .6, width = .2, height = 0) +
+  scale_x_continuous(labels = scales::number_format()) +
   theme(legend.position = "none") +
   #scale_x_log10() +
   labs(
     title = "Verdeling wachttijden per kamerType",
     #subtitle = "",
-    y = "Wachttijd in minuten",
-    x = NULL
+    x = "Wachttijd in minuten",
+    y = NULL
   )
 
+events_wrangle |>
+  filter(
+    resource %in%
+      c(
+        "Reception",
+        "Pharmacy",
+        "General Diagnosis Room",
+        "Operating Theatre",
+        "Electrolysis"
+      )
+  ) |>
+  ggplot(aes(x = waitTime, fill = startTimeMonth)) +
+  geom_histogram() +
+  facet_wrap(~resource, ncol = 1, scales = "free_y") +
+  scale_x_continuous(labels = scales::number_format())
 
 # Benutting ---------------
 # wat voor data heb ik nodig om dit te gaan berekenen?
@@ -137,10 +116,14 @@ boxplot_wachttijden <- events_wrangle |>
 # een totale tijd dat een behandelkamer beschibaar is (openingstijden)
 
 tabel_benutting <- events_wrangle |>
-  group_by(resource) |>
+  group_by(resource, startTimeMonth) |>
   summarise(
     sumWaitTime = sum(waitTime),
-    sumActivityTime = sum(activityTime)
+    avgWaitTime = mean(waitTime),
+    medianWaitTime = median(waitTime),
+    sumActivityTime = sum(activityTime),
+    avgActivityTime = mean(activityTime),
+    medianActivityTime = median(activityTime)
   ) |>
   left_join(
     resource_definitie |>
@@ -174,6 +157,7 @@ barplot_benutting <- tabel_benutting |>
       )
     )
   ) +
+  facet_wrap(~)
   scale_x_continuous(labels = scales::percent_format()) +
   labs(
     title = "Benutting per kamerType",
@@ -228,3 +212,30 @@ rapport <- histogram_aankomsttijden +
   barplot_benutting +
   barplot_ontslag +
   histogram_duratie_in_ziekenhuis
+
+# Maandelijkse aggregaties -------------
+
+events_wrangle |>
+  group_by(
+    startTimeMonth
+  ) |>
+  summarise(
+    patienten = n_distinct(name),
+    maxWaitTime = max(waitTime),
+    avgWaitTime = mean(waitTime),
+    medianWaitTime = median(waitTime),
+    maxActivityTime = max(activityTime),
+    avgActivityTime = mean(activityTime),
+    medianActivityTime = median(activityTime),
+  )
+
+log_aankomst_ontslag |>
+  group_by(
+    aankomstTijdstipMonth,
+    aandoeningOmschrijving
+  ) |>
+  summarise(
+    patienten = n_distinct(patient)
+  ) |>
+  pivot_wider(names_from = aankomstTijdstipMonth, values_from = patienten) |>
+  View()

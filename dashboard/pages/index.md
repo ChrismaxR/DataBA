@@ -1,72 +1,95 @@
 ---
-title: Theme Hospital — Overzicht
+title: Index
+hide_title: true
+hide_header: false
+breadcrumb: false
+hide_toc: true
 ---
 
+![Theme Hospital](/hero.png)
 
-```sql kpi
-SELECT
-  COUNT(DISTINCT patient)                           AS n_patienten,
-  SUM(CASE WHEN NOT isOntslagen THEN 1 ELSE 0 END)  AS n_wachtenden,
-  ROUND(AVG(waitTime), 1)                           AS gem_wachttijd
-FROM hospital.patienten p
-LEFT JOIN hospital.events e ON p.patient = e.name
-```
+# Wachttijden & Capaciteitsbeheer
 
-```sql toeloop_per_dag
-SELECT
-  simDag,
-  COUNT(*) AS n_patienten
-FROM hospital.patienten
-GROUP BY simDag
-ORDER BY simDag
-```
+Dit dashboard is gebouwd op basis van een discrete-event simulatie van een volledig jaar ziekenhuisoperaties in Theme Hospital. De simulatie modelleert de doorloop van patiënten — van aankomst tot ontslag — via 20 behandelkamers en 33 aandoeningen. 
 
-```sql top_wachttijd
-SELECT
-  resource,
-  ROUND(AVG(waitTime), 1) AS gem_wachttijd
-FROM hospital.events
-GROUP BY resource
-ORDER BY gem_wachttijd DESC
-LIMIT 10
-```
+Het doel: inzicht geven in wachttijden en bezettingsgraad, zodat capaciteitsbeslissingen beter onderbouwd kunnen worden.
 
-<Grid cols=3>
-  <BigValue
-    data={kpi}
-    value=n_patienten
-    title="Nieuwe patiënten"
-    fmt=num0
-  />
-  <BigValue
-    data={kpi}
-    value=n_wachtenden
-    title="Nog in behandeling"
-  />
-  <BigValue
-    data={kpi}
-    value=gem_wachttijd
-    title="Gem. wachttijd (min)"
-  />
+---
+
+## De Stakeholder
+
+<Grid cols=2>
+
+
+<div>
+Dr. Van Dalen is COO bij Theme Hospital in ThemeVille. Ze is 44 jaar en vervult al een aantal jaren haar rol in het ziekenhuis. Ze voelt zich betrokken bij het welbevinden van patiënten en medewerkers, en heeft als centraal richtpunt een fluïde doorloop van het zorgsysteem: van aankomst tot afronding van de juiste behandeling.<br> <br>  
+Haar voornaamste doel is **operationele excellence**. De sleutel daartoe ligt in het effectief managen van wachttijden — in Theme Hospital aangeduid als *Queue Length*.
+
+> *"Waar moet ik volgende maand capaciteit toevoegen of herverdelen om wachttijden onder X te houden?"*
+
+</div>
+
+<img src="/Persona.png" alt="Dr. Van Dalen" style="float: right; width: 230px; margin: 0 0 1rem 2rem;" />
+
+
 </Grid>
 
+---
 
-<BarChart
-  data={toeloop_per_dag}
-  x=simDag
-  y=n_patienten
-  title="Patiëntentoeloop per simulatiedag"
-  xAxisTitle="Dag"
-  yAxisTitle="Aantal patiënten"
-/>
+Goed wachttijdbeheer is van belang voor:
+- de gezondheid en het welbevinden van patiënten
+- de operationele excellentie van de organisatie
+- de cashflow van het ziekenhuis
+- de reputatie van het ziekenhuis
 
-<BarChart
-  data={top_wachttijd}
-  x=resource
-  y=gem_wachttijd
-  swapXY=true
-  title="Gem. wachttijd per kamertype (top 10)"
-  xAxisTitle="Gem. wachttijd (min)"
-  yAxisTitle=null
-/>
+Theme Hospital hanteert een **maandelijkse rapportagecyclus** om de operatie op dit vlak te reviewen.
 
+---
+
+## Afhankelijkheden & onzekerheden
+
+<Grid cols=2>
+
+<div>
+
+**Afhankelijkheden**
+- Toeloop van patiënten
+- Beschikbaarheid van diagnose- en behandelcapaciteit
+- Diagnose- en behandelfouten
+- Gelimiteerde capaciteit: het ziekenhuis heeft een eindige capaciteit
+
+</div>
+
+<div>
+
+**Onzekerheden**
+- Variatie in voorkomendheid van te behandelen aandoeningen
+- Onbeschikbaarheid van apparatuur door slijtage en storingen
+- Beschikbaarheid van personeel door verloop
+
+</div>
+
+</Grid>
+
+---
+
+## Informatiebehoefte van Dr. Van Dalen
+
+1. Wat zijn de wachttijden in het ziekenhuis?
+2. Wat is de benuttingsgraad van de behandelkamers?
+3. Is de verhouding met de zorgcapaciteit in balans?
+4. Hoe ontwikkelt de benutting zich door de tijd?
+5. Hoe ontwikkelt de capaciteit zich door de tijd?
+6. Welke instrumenten zijn er om eventuele problemen te voorkomen?
+7. Kan benutting en capaciteit gemodelleerd worden voor forecasts?
+
+---
+
+## Opbouw van dit dashboard
+
+| Pagina | Inhoud |
+|--------|--------|
+| **Overzicht** | KPI's op hoofdlijnen: patiëntaantallen, wachttijden en toeloop per dag |
+| **Capaciteit** | Bezettingsgraad per kamertype — waar zit de druk? |
+| **Wachtrijen** | Wachttijdanalyse per resource en aandoening |
+| **Ziekteverloop** | Doorlooptijden en behandelroutes per aandoening |

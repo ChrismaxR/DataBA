@@ -1,3 +1,4 @@
+library(tidyverse)
 source("data/statsScripts/simmer/simmerStatistics.R")
 run_date <- Sys.Date()
 

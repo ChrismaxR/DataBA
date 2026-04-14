@@ -3,33 +3,12 @@
 ## Duratie van de simulatie - je geeft het in minuten op.
 dayMinutes <- 24 * 60
 workDayMinutes <- 8 * 60
-simDays <- 62
+simDays <- 365
 simDuration <- simDays * dayMinutes
 
 ## Simulatieresources - hoeveelheid servers/kamers dat elke resource heeft.
 resource_definitie <- data.frame(
-  id = c(
-    1L,
-    2L,
-    3L,
-    4L,
-    5L,
-    6L,
-    7L,
-    8L,
-    9L,
-    10L,
-    11L,
-    12L,
-    13L,
-    14L,
-    15L,
-    16L,
-    17L,
-    18L,
-    19L,
-    20L
-  ),
+  id = c(1L:20L),
   resourceName = c(
     "Reception",
     "GP's Office",
@@ -57,19 +36,19 @@ resource_definitie <- data.frame(
     3,
     1,
     1,
+    2,
+    3,
+    2,
+    1,
+    2,
+    2,
+    2,
+    1,
+    1,
+    3,
+    2,
+    3,
     4,
-    3,
-    2,
-    1,
-    1,
-    2,
-    2,
-    1,
-    1,
-    3,
-    2,
-    3,
-    1,
     2,
     1,
     1
@@ -88,7 +67,13 @@ slackTongueCapaciteit <- resource_definitie$capacity[
 ]
 
 ## Distributie/tempo waarmee nieuwe aankomsten van patienten worden gegenereerd
-### Nu minimaal na 1 minuut, maximaal binnen 5 minuten.
+### Kwartaalschema: rate bepaalt gemiddelde tussentijd (minuten) tussen aankomsten.
+aankomst_schema <- tibble::tibble(
+  dag_van = c(0, 90, 180, 270),
+  rate = c(1 / 3, 1 / 2, 1 / 4, 1 / 3) # Q1 normaal, Q2 druker, Q3 rustiger, Q4 normaal
+)
+
+## Standaard aankomstDistributie (wordt overschreven in simmerImplementatie.R)
 aankomstDistributie <- function() rexp(n = 1, rate = 1 / 3)
 
 ## Duraties van de behandeling van de verschillende resources
@@ -101,6 +86,35 @@ slackTongueTimeoutDuratie <- function() runif(1, 15, 30)
 # Bepalen van de aandoening van een patient
 ## in traj0 object wordt het attribuut aandoeningId bepaald:
 aandoeningBepaling <- function() sample(x = c(1L:2L), size = 1, replace = T)
+
+## Variabiliteit in behandelduur per kwartaal (vermenigvuldiger op basis service tijden)
+service_schema <- tibble::tibble(
+  dag_van = c(0, 90, 180, 270),
+  multiplier = c(1.0, 1.2, 0.9, 1.1) # Q2 trager, Q3 sneller, Q4 licht trager
+)
+
+## Epidemie-instellingen (Infectious Laughter, bellcurve piek midden van het jaar)
+epidemie_aandoening_id <- 12L
+epidemie_piek_dag <- 182
+epidemie_sd_dagen <- 20
+epidemie_piek_gewicht <- 25
+
+## Geplande capaciteitswijzigingen gedurende het jaar
+capaciteit_schema <- tibble::tibble(
+  dag = c(90, 180, 270, 90, 180, 270, 90, 180, 270),
+  resourceName = c(
+    "Psychiatric Room",
+    "Psychiatric Room",
+    "Psychiatric Room",
+    "Hair Restoration",
+    "Hair Restoration",
+    "Hair Restoration",
+    "Slack Tongue Clinic",
+    "Slack Tongue Clinic",
+    "Slack Tongue Clinic"
+  ),
+  nieuwe_cap = c(2, 3, 1, 2, 1, 1, 3, 2, 1)
+)
 
 # Look up tabellen
 
@@ -145,3 +159,15 @@ aandoeningDimensies <- tibble::tibble(
     id = as.character(row_number()), # genereer een Id
     aandoeningOmschrijving
   )
+
+# Configuratie voor simmerStatistics
+
+# helperfuncties --------------
+
+# Zet de starttijdstip om vanuit te rekenen
+simOrigin <- as.POSIXct("2025-01-01 09:00:00", tz = "UTC")
+
+# conversiefunctie om relatieve simmertijdstippen om te zetten naar "echte" datetimes
+to_datetime <- function(timeMinutes) {
+  simOrigin + as.difftime(timeMinutes, units = "mins")
+}
