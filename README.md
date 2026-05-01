@@ -77,8 +77,10 @@ flowchart LR
 ### 6.	What I would improve with more time
 
 - predictive modelling
-- seasonal influences on utilization and queue length
-- epidemic simulation
 - priority queueing - patiënten met een hogere prioriteit (zoals ongelukken en noodgevallen)
 - multiple stakeholders with conflicting interests
 - scenarios bouwen: wat als we meer kamers hadden gehad/meer patiënten te verstouwen hadden gehad, enz.
+- seasonal influences on utilization and queue length
+
+
+- epidemic simulation -> done! Infectious Laughter epidemie met een bellcurve-piek midden in het jaar (zie simmerConfig.R)

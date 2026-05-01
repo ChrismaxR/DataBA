@@ -93,6 +93,8 @@ Four pages: `index.md` (KPI overview), `capaciteit.md` (utilisation), `wachtrije
 
 These are the required schemas for the monthly aggregation output. Column names are in snake_case Dutch. The dashboard SQL must match exactly.
 
+`jaar` and `maand` are always derived from the `startTimeReal` / `aankomstTijdstipReal` timestamp columns using lubridate — never from the `startTimeMonth` string label.
+
 ### `maandelijks_wachttijd.csv`
 | column | type | description |
 |---|---|---|
@@ -101,8 +103,10 @@ These are the required schemas for the monthly aggregation output. Column names 
 | jaar | integer | e.g. 2025 |
 | maand | integer | 1–12 |
 | gem_wachttijd | double | mean wait time in minutes |
-| p95_wachttijd | double | 95th percentile wait |
-| n_patienten | integer | visits to this resource that month |
+| med_wachttijd | double | median wait time in minutes |
+| p95_wachttijd | double | 95th percentile wait time in minutes |
+| n_patienten | integer | distinct patient visits to this resource that month |
+| n_lang_wachtend | integer | visits where waitTime > 60 min (LANG_WACHTTIJD_DREMPEL) |
 
 ### `maandelijks_benutting.csv`
 | column | type | description |
@@ -111,16 +115,19 @@ These are the required schemas for the monthly aggregation output. Column names 
 | resource_naam | character | |
 | jaar | integer | |
 | maand | integer | |
-| bezettingsgraad | double | 0–1, sumActivityTime / (capacity × maand_minuten) |
+| bezettingsgraad | double | 0–1, sumActivityTime / (capacity × days_in_month × workDayMinutes) |
+| n_patienten | integer | total visits to this resource that month |
 
 ### `maandelijks_instroom.csv`
 | column | type | description |
 |---|---|---|
 | aandoening_id | integer | 1–33 |
-| aandoening | character | from simmerConfig |
+| aandoening | character | from simmerConfig (aandoeningOmschrijving) |
 | jaar | integer | |
 | maand | integer | |
-| n_patienten | integer | unique arrivals that month |
+| n_patienten | integer | distinct patient arrivals that month |
+| gem_verblijfsduur | double | mean total hospital stay in minutes (NA if not discharged) |
+| med_verblijfsduur | double | median total hospital stay in minutes (NA if not discharged) |
 
 ---
 

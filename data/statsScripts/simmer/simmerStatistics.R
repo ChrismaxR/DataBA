@@ -11,17 +11,17 @@ tictoc::toc()
 
 glimpse(events_wrangle)
 
-events_wrangle |> 
-  ##group_by(startTimeMonth) |> 
+events_wrangle |>
+  ##group_by(startTimeMonth) |>
   summarise(
     patienten = n_distinct(name)
   )
 
-log_aankomst_ontslag |> 
-  ##group_by(aankomstTijdstipMonth) |> 
-    summarise(
-      patienten = n_distinct(patient)
-    )
+log_aankomst_ontslag |>
+  ##group_by(aankomstTijdstipMonth) |>
+  summarise(
+    patienten = n_distinct(patient)
+  )
 
 
 # Wat wil ik berekenen?  ----------------
@@ -157,7 +157,6 @@ barplot_benutting <- tabel_benutting |>
       )
     )
   ) +
-  facet_wrap(~)
   scale_x_continuous(labels = scales::percent_format()) +
   labs(
     title = "Benutting per kamerType",
