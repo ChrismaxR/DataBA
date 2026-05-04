@@ -6,7 +6,7 @@ library(dplyr)
 set.seed(42)
 
 # configuratiesettings -------
-source("data/generateScripts/simmer/simmerConfig.R")
+source("data/generateScripts/simmerConfig.R")
 
 # Gedeelde helper: zoek de huidige waarde op in een tijdschema op basis van now(env)
 schema_opzoeken <- function(schema, kolom) {

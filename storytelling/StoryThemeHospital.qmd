@@ -1,0 +1,25 @@
+# Data storytelling
+
+How does this work?
+- plaatjes toevoegen?
+- Tabjes maken om verschillende onderwerpen naast elkaar te hebben
+ * Inleiding + persona
+ * Metrieken -> ggplot2?
+
+Theme Hospital ❤️ Wat was Theme Hospital ook al [weer](https://www.nme.com/features/gaming-features/why-theme-hospital-is-the-greatest-of-the-simulation-satires-3096680)?
+
+
+# Stakeholder
+Ziekenhuisbestuurder die "Queue length" moet managen.
+
+![](./docs/png/Persona.png)
+
+```markdown
+# This is the first tab
+
+Some content goes here.
+
+# This is the second tab
+
+Other content goes here.
+```

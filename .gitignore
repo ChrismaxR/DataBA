@@ -16,3 +16,6 @@ build
 static/data
 *.options.yaml
 .env
+/renv/library
+/storytelling/project_files
+/storytelling/StoryThemeHospital_files

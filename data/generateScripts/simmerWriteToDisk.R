@@ -1,5 +1,5 @@
 library(tidyverse)
-source("data/statsScripts/simmer/simmerStatistics.R")
+source("data/statsScripts/simmerStatistics.R")
 run_date <- Sys.Date()
 
 # Visueel rapport naar disk ------------------

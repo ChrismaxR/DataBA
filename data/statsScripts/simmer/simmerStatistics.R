@@ -5,8 +5,8 @@ library("tidyverse")
 library("patchwork")
 
 tictoc::tic()
-source("data/generateScripts/simmer/simmerConfig.R")
-source("data/generateScripts/simmer/simmerImplementatie.R")
+source("data/generateScripts/simmerConfig.R")
+source("data/generateScripts/simmerImplementatie.R")
 tictoc::toc()
 
 glimpse(events_wrangle)
