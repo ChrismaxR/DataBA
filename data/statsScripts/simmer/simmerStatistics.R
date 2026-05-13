@@ -10,6 +10,8 @@ source("data/generateScripts/simmerImplementatie.R")
 tictoc::toc()
 
 glimpse(events_wrangle)
+glimpse(log_aankomst_ontslag)
+glimpse(resources)
 
 events_wrangle |>
   ##group_by(startTimeMonth) |>
@@ -22,6 +24,22 @@ log_aankomst_ontslag |>
   summarise(
     patienten = n_distinct(patient)
   )
+
+# Algemeen plaatje van de data
+
+log_aankomst_ontslag |> 
+  group_by(aankomstTijdstipMonth) |> 
+  count(aandoeningOmschrijving) |> 
+  ggplot(
+    aes(
+      x = aankomstTijdstipMonth, 
+      y = n, 
+      colour = aandoeningOmschrijving,
+      group = aandoeningOmschrijving 
+    )
+  ) +
+  geom_line() +
+  geom_point(size = 3)
 
 
 # Wat wil ik berekenen?  ----------------
@@ -65,8 +83,8 @@ boxplot_behandeltijden <- events_wrangle |>
     x = activityTime,
     fill = resource
   )) +
+  geom_jitter(alpha = .2, height = .3) +
   geom_boxplot() +
-  geom_jitter(alpha = .6, width = .5, height = 0) +
   theme(legend.position = "none") +
   labs(
     title = "Verdeling behandeltijden per kamerType",
@@ -82,8 +100,8 @@ boxplot_wachttijden <- events_wrangle |>
     x = waitTime,
     fill = resource
   )) +
+  geom_jitter(alpha = .2, height = 0.3) +
   geom_boxplot() +
-  geom_jitter(alpha = .6, width = .2, height = 0) +
   scale_x_continuous(labels = scales::number_format()) +
   theme(legend.position = "none") +
   #scale_x_log10() +
@@ -158,6 +176,7 @@ barplot_benutting <- tabel_benutting |>
     )
   ) +
   scale_x_continuous(labels = scales::percent_format()) +
+  facet_wrap(~startTimeMonth, scales = "free_y") +
   labs(
     title = "Benutting per kamerType",
     subtitle = "dus niet per server/individuele kamer",
@@ -195,9 +214,9 @@ barplot_ontslag <- log_aankomst_ontslag |>
 
 histogram_duratie_in_ziekenhuis <- log_aankomst_ontslag |>
   filter(!is.na(duratieInZiekenhuis)) |>
-  ggplot(aes(x = duratieInZiekenhuis, fill = aandoeningId)) +
+  ggplot(aes(x = duratieInZiekenhuis, fill = aandoeningOmschrijving)) +
   geom_histogram(binwidth = 30) +
-  facet_wrap(~aandoeningId) +
+  facet_wrap(~aandoeningId, scales = "free") +
   labs(
     title = "Verdeling minuten in ziekenhuis",
     y = "Aantal patienten",
