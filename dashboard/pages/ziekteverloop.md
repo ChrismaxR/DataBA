@@ -51,7 +51,7 @@ ORDER BY simDag
   <BigValue data={kpi_ziekte} value=n_wachtenden   title="Nog aanwezig" />
 </Grid>
 
-<BarChart
+<AreaChart
   data={toeloop_per_dag}
   x=simDag
   y={['ontslagen', 'nog_aanwezig']}

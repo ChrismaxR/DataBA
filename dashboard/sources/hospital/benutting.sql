@@ -1,5 +1,11 @@
--- Benutting per kamertype: pakt de meest recente tabel_benutting CSV
--- Herberekent benutting op basis van werkuren (5 dagen × 480 min/dag per server)
-SELECT *
-FROM read_csv_auto('../output/*_tabel_benutting.csv', filename = true, union_by_name = true)
+-- Maandelijkse benutting per resource, berekend met correcte maanddenominant
+-- (capacity × werkdagminuten × kalenderdagen in die maand)
+SELECT
+  resource_id,
+  resource_naam   AS resource,
+  jaar,
+  maand,
+  bezettingsgraad AS utilization,
+  n_patienten
+FROM read_csv_auto('../output/aggregated/maandelijks_benutting.csv')
 

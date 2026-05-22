@@ -9,4 +9,6 @@ SELECT
   aandoeningId,
   aandoeningOmschrijving,
   CASE WHEN TRY_CAST(ontslagTijdstip AS DOUBLE) IS NOT NULL THEN true ELSE false END AS isOntslagen
-FROM read_csv_auto('../output/*_log_aankomst_ontslag.csv', union_by_name = true)
+FROM read_csv_auto('../output/*_log_aankomst_ontslag.csv',
+  union_by_name = true,
+  types = {'ontslagTijdstip': 'VARCHAR', 'duratieInZiekenhuis': 'VARCHAR'})

@@ -7,7 +7,7 @@ SELECT
   SUM(CASE WHEN NOT isOntslagen THEN 1 ELSE 0 END) AS n_wachtenden,
   ROUND(AVG(e.waitTime), 1)                         AS gem_wachttijd
 FROM hospital.patienten p
-LEFT JOIN hospital.events e USING (patient)
+LEFT JOIN hospital.events e ON p.patient = e.name
 ```
 
 ```sql wachttijd_per_kamer

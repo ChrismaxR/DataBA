@@ -13,7 +13,7 @@ library(tidyverse)
 library(lubridate)
 library(here)
 
-source(here("data/generateScripts/simmer/simmerConfig.R"))
+source(here("data/generateScripts/simmerConfig.R"))
 
 LANG_WACHTTIJD_DREMPEL <- 60L  # minuten — grens voor n_lang_wachtend
 

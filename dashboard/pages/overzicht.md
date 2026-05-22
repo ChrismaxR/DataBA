@@ -15,10 +15,12 @@ LEFT JOIN hospital.events e ON p.patient = e.name
 ```sql toeloop_per_dag
 SELECT
   simDag,
+  aandoeningOmschrijving,
   COUNT(*) AS n_patienten
 FROM hospital.patienten
-GROUP BY simDag
-ORDER BY simDag
+where aandoeningOmschrijving = 'Infectious Laughter'
+GROUP BY simDag, aandoeningOmschrijving
+ORDER BY simDag, aandoeningOmschrijving
 ```
 
 ```sql top_wachttijd
@@ -51,11 +53,12 @@ LIMIT 10
 </Grid>
 
 
-<BarChart
+<AreaChart
   data={toeloop_per_dag}
   x=simDag
   y=n_patienten
   title="Patiëntentoeloop per simulatiedag"
+  series=aandoeningOmschrijving
   xAxisTitle="Dag"
   yAxisTitle="Aantal patiënten"
 />
