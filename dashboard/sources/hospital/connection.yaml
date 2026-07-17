@@ -2,6 +2,6 @@
 type: duckdb
 name: hospital
 options:
-  filename: ':memory:'
+  filename: 'hospital.duckdb'
 buildOptions:
   batchSize: 1000000

@@ -12,7 +12,7 @@
 
 ## 😭 Probleemdefinities
 - CEO -> Financieel gezondheidsbeeld, Strategische KPI’s afgestemd op doelstellingen, Markt en klantinzichten, Risico- & data-kwaliteit
-- COO -> Supply chain & logistiek, operationele efficiency, defect- en foutrappartages
+- COO -> Supply chain & logistiek, operationele efficiency, defect- en foutrappartages, klant-/patiënttevredenheid
 - HR officer -> hires, vacancies, employee churn, # dagen vac open, # applicants
 - Onderwijs -> studentscores, welzijn, 
 - DNB -> Inflatie, cyber & data, duurzaamheid & klimaat, witwassen

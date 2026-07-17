@@ -6,7 +6,7 @@ library(dplyr)
 set.seed(42)
 
 # configuratiesettings -------
-source("data/generateScripts/simmerConfig.R")
+source("src/generateScripts/simmerConfig.R")
 
 # Gedeelde helper: zoek de huidige waarde op in een tijdschema op basis van now(env)
 schema_opzoeken <- function(schema, kolom) {
@@ -375,23 +375,6 @@ resources <- get_mon_resources(env) |>
     tibble()
 
 # 6) Wrangle data -------------
-# waitTime berekenen (maar nog niet zeker of dit de juiste manier is), factor maken van resources
-# plus daadwerkelijke tijdstippen maken m.b.v. helper uit
-
-events_wrangle <- events |>
-    mutate(
-        # waitTime = tijd in de wachtrij = totale verblijfstijd bij resource minus daadwerkelijke behandeltijd
-        # (endTime - startTime) geeft de totale tijd, activityTime is de diensttijd -> verschil is wachttijd
-        waitTime = (endTime - activityTime) - startTime,
-        resource = factor(
-            resource,
-            levels = resource_definitie$resourceName
-        ),
-        startTimeReal = to_datetime(startTime),
-        endTimeReal = to_datetime(endTime),
-        startTimeMonth = month(startTimeReal, label = T),
-        endTimeMonth = month(endTimeReal, label = T)
-    )
 
 # In de log_() functie kan ik allemaal eigenschappen van patienten kwijt
 # als ik dat doet met de vorm "eigenschap = nummeriekeWaarde", dan kan ik deze eenvoudig in deze tibble kwijt.
@@ -421,3 +404,64 @@ log_aankomst_ontslag <- log_df |>
     ) |>
     rename(patient = 1) |>
     left_join(patientAttributes, by = "patient")
+
+# waitTime berekenen (maar nog niet zeker of dit de juiste manier is), factor maken van resources
+# plus daadwerkelijke tijdstippen maken m.b.v. helper uit
+
+# simmer registreert zelf niet welke fysieke server/kamer een aankomst bezette
+# (get_mon_resources geeft enkel een aantal bezette servers per tijdstip terug).
+# Deze functie herleidt dat achteraf per resource via interval scheduling:
+# elke seize-release cyclus krijgt de laagst genummerde server die op dat
+# moment vrij is, anders een nieuw servernummer.
+# Tolerantie: bij een naadloze overdracht (server komt vrij op exact het
+# moment dat de volgende aankomst wordt gezeisd) kunnen endTime en
+# startTime + waitTime elkaar op double-precisieniveau net mislopen (andere
+# afleiding, geen exacte bit-match), waardoor er ten onrechte een extra slot
+# geopend werd. 1e-6 minuten ligt ver onder elk reeel wachttijdverschil.
+kamer_tolerantie <- 1e-6
+
+ken_kamerNummer_slots_toe <- function(df) {
+    service_start <- df$startTime + df$waitTime
+    volgorde <- order(service_start)
+    vrij_vanaf <- numeric(0)
+    kamerNummer <- integer(nrow(df))
+
+    for (i in volgorde) {
+        vrije_slot <- which(vrij_vanaf <= service_start[i] + kamer_tolerantie)[
+            1
+        ]
+        if (is.na(vrije_slot)) {
+            vrij_vanaf <- c(vrij_vanaf, df$endTime[i])
+            vrije_slot <- length(vrij_vanaf)
+        } else {
+            vrij_vanaf[vrije_slot] <- df$endTime[i]
+        }
+        kamerNummer[i] <- vrije_slot
+    }
+
+    df$kamerNummer <- kamerNummer
+    df
+}
+
+events_wrangle <- events |>
+    left_join(patientAttributes, by = c("name" = "patient")) |>
+    mutate(
+        # waitTime = tijd in de wachtrij = totale verblijfstijd bij resource minus daadwerkelijke behandeltijd
+        # (endTime - startTime) geeft de totale tijd, activityTime is de diensttijd -> verschil is wachttijd
+        waitTime = (endTime - activityTime) - startTime,
+        resource = factor(
+            resource,
+            levels = resource_definitie$resourceName
+        ),
+        startTimeReal = to_datetime(startTime),
+        endTimeReal = to_datetime(endTime),
+        startTimeMonth = month(startTimeReal, label = T),
+        endTimeMonth = month(endTimeReal, label = T),
+        acitivityMonth = month(endTimeReal - dminutes(activityTime))
+    ) |>
+    mutate(rijVolgorde = row_number()) |>
+    group_by(resource) |>
+    group_modify(~ ken_kamerNummer_slots_toe(.x)) |>
+    ungroup() |>
+    arrange(rijVolgorde) |>
+    dplyr::select(-rijVolgorde) #simmmer heeft ook select function... da's niet best.

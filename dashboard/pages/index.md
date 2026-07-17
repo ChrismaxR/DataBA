@@ -16,6 +16,45 @@ Het doel: inzicht geven in wachttijden en bezettingsgraad, zodat capaciteitsbesl
 
 ---
 
+# Kenmerken van dit ziekenhuis
+
+
+<Grid cols=3>
+  <BigValue 
+    data={totaal} 
+    value=behandelkamers
+    title="# Behandelkamers"
+  />
+  <BigValue 
+    data={totaal} 
+    value=aandoeningen
+    title="# Aandoeningen"
+  />
+  <BigValue 
+    data={totaal} 
+    value=patienten
+    title="# Patienten"
+  />
+  <BigValue 
+    data={totaal} 
+    value=gemiddeldeBehandeltijdMin
+    title="Gem. Behandeltijd (minuten)"
+  />
+  <BigValue 
+    data={totaal} 
+    value=gemiddeldeWachttijdMin
+    title="Gem. Wachttijdn (minuten)"
+  />
+  <BigValue 
+    data={totaal} 
+    value=mediaanWachttijdMin
+    title="Mediane wachttijd (minuten)"
+  />
+
+</Grid>
+
+
+---
 ## De Stakeholder
 
 <Grid cols=2>
@@ -85,11 +124,9 @@ Theme Hospital hanteert een **maandelijkse rapportagecyclus** om de operatie op 
 
 ---
 
-## Opbouw van dit dashboard
 
-| Pagina | Inhoud |
-|--------|--------|
-| **Overzicht** | KPI's op hoofdlijnen: patiëntaantallen, wachttijden en toeloop per dag |
-| **Capaciteit** | Bezettingsgraad per kamertype — waar zit de druk? |
-| **Wachtrijen** | Wachttijdanalyse per resource en aandoening |
-| **Ziekteverloop** | Doorlooptijden en behandelroutes per aandoening |
+
+```sql totaal
+select * from totaal
+
+```

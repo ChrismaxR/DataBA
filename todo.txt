@@ -1,0 +1,10 @@
+// wat te doen om dit verhaal verder te brengen
+
+1. Itereer over dashboard, miss geen aggregatie inladen, maar platte data?
+2. Herschrijf architectuur
+3. Capaciteitpagina: top 8/10 + lowest 8/10 laten zien
+4. Aankomstpagina: toch iets gavers laten zien?
+5. Behandeltijdpagina: filters fixen, die werken opeens niet meer :(
+6. itereer over hoe ik de simulatie wil aanpassen om wat gavere patronen te laten zien
+  - ik vind dat toeloop veel te weinig variabiliteit laat zien...
+  - gekkere patronen introduceren in behandeltijd?

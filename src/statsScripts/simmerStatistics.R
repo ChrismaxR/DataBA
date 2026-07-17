@@ -27,15 +27,15 @@ log_aankomst_ontslag |>
 
 # Algemeen plaatje van de data
 
-log_aankomst_ontslag |> 
-  group_by(aankomstTijdstipMonth) |> 
-  count(aandoeningOmschrijving) |> 
+log_aankomst_ontslag |>
+  group_by(aankomstTijdstipMonth) |>
+  count(aandoeningOmschrijving) |>
   ggplot(
     aes(
-      x = aankomstTijdstipMonth, 
-      y = n, 
+      x = aankomstTijdstipMonth,
+      y = n,
       colour = aandoeningOmschrijving,
-      group = aandoeningOmschrijving 
+      group = aandoeningOmschrijving
     )
   ) +
   geom_line() +
@@ -128,13 +128,15 @@ events_wrangle |>
   facet_wrap(~resource, ncol = 1, scales = "free_y") +
   scale_x_continuous(labels = scales::number_format())
 
+# Capaciteit ------------
+
 # Benutting ---------------
 # wat voor data heb ik nodig om dit te gaan berekenen?
 # starttijd dat kamer in behandeling is + eindtijd -> geeft blokken van benutting.
 # een totale tijd dat een behandelkamer beschibaar is (openingstijden)
 
 tabel_benutting <- events_wrangle |>
-  group_by(resource, startTimeMonth) |>
+  group_by(startTimeMonth, resource, kamerNummer) |>
   summarise(
     sumWaitTime = sum(waitTime),
     avgWaitTime = mean(waitTime),

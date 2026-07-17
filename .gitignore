@@ -19,3 +19,6 @@ static/data
 /renv/library
 /storytelling/project_files
 /storytelling/StoryThemeHospital_files
+oud/fct_event.csv
+.gitignore
+oud/hospital.duckdb

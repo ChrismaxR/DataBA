@@ -42,7 +42,7 @@ flowchart LR
 
     subgraph Verwerking["🔧 Statistieken & Wrangling  •  R + tidyverse"]
         STAT["simmerStatistics.R\n─────────────────\n• Wachttijd berekenen\n• Tijdstempels mappen\n• Bezettingsgraad aggregeren"]
-        WRITE["simmerWriteToDisk.R"]
+        WRITE["simmerWriteToDisk.R"]  
     end
 
     subgraph Opslag["💾 Output  •  CSV"]

@@ -1,4 +1,4 @@
-# Voorgestelde opzet van een evidence dashboard
+§# Voorgestelde opzet van een evidence dashboard
 Claude cowork gevraagd om op basis van voorgaande 6 stories een ontwerp voor een dashboard te genereren. 
 Hieronder de respons: 
 
