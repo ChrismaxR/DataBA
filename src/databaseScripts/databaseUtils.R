@@ -6,103 +6,76 @@ con <- dbConnect(
 )
 
 
-# source: https://r.duckdb.org
+# set up datamodel tabellen --------------
+# Fact-tabellen eerst droppen: een dimensie kan niet vervangen worden zolang
+# een foreign key ernaar verwijst.
+dbExecute(con, "DROP TABLE IF EXISTS fct_gebeurtenis")
+dbExecute(con, "DROP TABLE IF EXISTS fct_behandelkamer")
 
-# set up duckdb tables --------------
 dbExecute(
   con,
-  "CREATE TABLE totaal (
-    behandelkamers INT,
-    aandoeningen INT,
-    patienten INT,
-    gemiddeldeBehandeltijdMin DOUBLE,
-    gemiddeldeWachttijdMin DOUBLE,
-    mediaanWachttijdMin DOUBLE
+  "CREATE OR REPLACE TABLE dim_aandoening (
+    id INTEGER PRIMARY KEY,
+    aandoeningNaam TEXT NOT NULL
     )"
 )
 
 dbExecute(
   con,
-  "CREATE TABLE aankomstOntslag (
-    maand DATE,
-    maandLabel TEXT,
-    ontslagen TEXT,
-    aandoeningOmschrijving TEXT,
-    patienten INT,
-    gemiddeldeTijdInZiekenhuisMin DOUBLE
-  )"
-)
-
-dbExecute(
-  con,
-  "CREATE TABLE capaciteit (
-    maand DATE,
-    maandLabel TEXT,
-    kamer TEXT,
-    totaleBehandeltijdMin DOUBLE,
-    benuttingPerc DOUBLE,
-    wachttijdMin DOUBLE,
-    patientenBehandeld INT,
-    gemiddeldeBehandeltijdPerPatientMin DOUBLE,
-    gemiddeldeWachttijdPerPatientMin DOUBLE
+  "CREATE OR REPLACE TABLE dim_patient (
+    id INTEGER PRIMARY KEY,
+    aandoeningId INTEGER REFERENCES dim_aandoening (id)
     )"
 )
 
 dbExecute(
   con,
-  "CREATE TABLE behandeltijd (
-    maand DATE,
-    maandLabel TEXT,
-    kamerType TEXT,
-    aandoening TEXT,
-    patientenBehandeld INT,
-    somBehandeltijdMin DOUBLE,
-    gemBehandeltijdMin DOUBLE,
-    mediaanBehandeltijdMin DOUBLE
+  "CREATE OR REPLACE TABLE dim_behandelkamer (
+    id INTEGER PRIMARY KEY,
+    behandelkamerNaam TEXT NOT NULL,
+    behandelkamerType TEXT
     )"
 )
 
-## Remove tabels
-# dbRemoveTable(conn = con, name = "aankomstOntslag")
-
-# write to duckdb tables --------------
-
-dbWriteTable(
-  conn = con,
-  "totaal",
-  totaal,
-  append = F,
-  overwrite = T
+dbExecute(
+  con,
+  "CREATE TABLE fct_gebeurtenis (
+    id INTEGER PRIMARY KEY,
+    patientId INTEGER REFERENCES dim_patient (id),
+    startTijdstip TIMESTAMP,
+    eindTijdstip TIMESTAMP,
+    behandeltijd DOUBLE,
+    wachttijd DOUBLE,
+    behandelkamerId INTEGER REFERENCES dim_behandelkamer (id),
+    behandelkamerNummer INTEGER,
+    simulatieRun INTEGER
+    )"
 )
 
-dbWriteTable(
-  conn = con,
-  "aankomstOntslag",
-  aankomst_onstlag,
-  append = F,
-  overwrite = T
+# maxWachtrijOmvang en wachtrijLimiet zijn DOUBLE: simmer geeft hier Inf terug.
+dbExecute(
+  con,
+  "CREATE TABLE fct_behandelkamer (
+    id INTEGER PRIMARY KEY,
+    tijdstip TIMESTAMP,
+    behandelkamerId INTEGER REFERENCES dim_behandelkamer (id),
+    patientenInBehandeling INTEGER,
+    capaciteit INTEGER,
+    patientenInWachtrij INTEGER,
+    maxWachtrijOmvang DOUBLE,
+    wachtrijLimiet DOUBLE,
+    totaalPatientenBijBehandelkamer INTEGER,
+    simulatieRun INTEGER
+    )"
 )
 
-dbWriteTable(
-  conn = con,
-  "capaciteit",
-  capaciteitMaandResourceKamerNummer,
-  append = F,
-  overwrite = T
-)
-
-dbWriteTable(
-  conn = con,
-  "behandeltijd",
-  behandeltijdMaandResourceAandoening,
-  append = F,
-  overwrite = T
-)
-
-# check of tabellen gevuld zijn ----------------------
-# dbReadTable(con, "totaal")
-# dbReadTable(con, "aankomstOntslag")
-# dbReadTable(con, "capaciteit")
-# dbReadTable(con, "behandeltijd")
+# write to datamodel tabellen --------------
+# dbAppendTable i.p.v. dbWriteTable(overwrite = T): zo blijven de types en
+# keys uit de CREATE-statements behouden. Dimensies voor facts i.v.m. foreign keys.
+dbAppendTable(con, "dim_aandoening", dim_aandoening)
+dbAppendTable(con, "dim_patient", dim_patient)
+dbAppendTable(con, "dim_behandelkamer", dim_behandelkamer)
+dbAppendTable(con, "fct_gebeurtenis", fct_gebeurtenis)
+dbAppendTable(con, "fct_behandelkamer", fct_behandelkamer)
 
 dbDisconnect(con)

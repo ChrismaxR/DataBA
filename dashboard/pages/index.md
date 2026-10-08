@@ -8,61 +8,21 @@ hide_toc: true
 
 ![Theme Hospital](/hero.png)
 
-# Wachttijden & Capaciteitsbeheer
+# Case: Wachttijden & Capaciteitsbeheer in een fictief Ziekenhuis
 
-Dit dashboard is gebouwd op basis van een discrete-event simulatie van een volledig jaar ziekenhuisoperaties in Theme Hospital. De simulatie modelleert de doorloop van patiënten — van aankomst tot ontslag — via 20 behandelkamers en 33 aandoeningen. 
+Dit is een casebeschrijving van hoe ik als Business Analist binnenn een data/BI team een project zou uitvoeren. 
 
-Het doel: inzicht geven in wachttijden en bezettingsgraad, zodat capaciteitsbeslissingen beter onderbouwd kunnen worden.
-
----
-
-# Kenmerken van dit ziekenhuis
-
-
-<Grid cols=3>
-  <BigValue 
-    data={totaal} 
-    value=behandelkamers
-    title="# Behandelkamers"
-  />
-  <BigValue 
-    data={totaal} 
-    value=aandoeningen
-    title="# Aandoeningen"
-  />
-  <BigValue 
-    data={totaal} 
-    value=patienten
-    title="# Patienten"
-  />
-  <BigValue 
-    data={totaal} 
-    value=gemiddeldeBehandeltijdMin
-    title="Gem. Behandeltijd (minuten)"
-  />
-  <BigValue 
-    data={totaal} 
-    value=gemiddeldeWachttijdMin
-    title="Gem. Wachttijdn (minuten)"
-  />
-  <BigValue 
-    data={totaal} 
-    value=mediaanWachttijdMin
-    title="Mediane wachttijd (minuten)"
-  />
-
-</Grid>
-
+Deze case betreft een zogenaamde 'Discrete Event Simulatie' (DES) van een volledig jaar ziekenhuisoperaties in het fictieve ziekenhuis Theme Hospital. De simulatie modelleert de behandeling van patiënten — van aankomst tot ontslag — met in totaal 33 aandoeningen in 19 verschillende type behandelkamers. De set is gebaseerd op een ziekenhuissimulatiespel (scrabble woord!) uit de jaren negentig, wat ik met veel plezier helemaal kapot heb gespeeld.  
 
 ---
-## De Stakeholder
+## De Stakeholder (Stakeholder/user analysis)
 
 <Grid cols=2>
 
 
 <div>
 Dr. Van Dalen is COO bij Theme Hospital in ThemeVille. Ze is 44 jaar en vervult al een aantal jaren haar rol in het ziekenhuis. Ze voelt zich betrokken bij het welbevinden van patiënten en medewerkers, en heeft als centraal richtpunt een fluïde doorloop van het zorgsysteem: van aankomst tot afronding van de juiste behandeling.<br> <br>  
-Haar voornaamste doel is **operationele excellence**. De sleutel daartoe ligt in het effectief managen van wachttijden — in Theme Hospital aangeduid als *Queue Length*.
+Haar voornaamste doel is operationele excellence. De sleutel daartoe ligt in het effectief benutten van zorgcapaciteit en het managen van wachttijden.
 
 > *"Waar moet ik volgende maand capaciteit toevoegen of herverdelen om wachttijden onder X te houden?"*
 
@@ -73,38 +33,96 @@ Haar voornaamste doel is **operationele excellence**. De sleutel daartoe ligt in
 
 </Grid>
 
----
+Deze vraag juist beantwoorden heeft een positief effect op:
 
-Goed wachttijdbeheer is van belang voor:
 - de gezondheid en het welbevinden van patiënten
-- de operationele excellentie van de organisatie
-- de cashflow van het ziekenhuis
-- de reputatie van het ziekenhuis
-
-Theme Hospital hanteert een **maandelijkse rapportagecyclus** om de operatie op dit vlak te reviewen.
+- de optimale benutting van personeel en middelen
+- de reputatie & financieel resultaat van het ziekenhuis
 
 ---
 
-## Afhankelijkheden & onzekerheden
+## Informatiebehoefte van Dr. Van Dalen (Requirements engineering)
+
+1. Wat zijn de wachttijden in het ziekenhuis?
+2. Wat is de benuttingsgraad van de behandelkamers?
+3. Is de verhouding tussen zorgcapaciteit en benutting in balans?
+4. Hoe ontwikkelt de benutting zich door de tijd?
+5. Hoe ontwikkelt de capaciteit zich door de tijd?
+6. Welke instrumenten zijn er om eventuele problemen te voorkomen?
+7. Kan benutting en capaciteit gemodelleerd worden voor forecasts?
+
+Theme Hospital hanteert een **maandelijkse rapportagecyclus** om de operatie te reviewen.
+
+---
+
+## Modelleren van Theme Hospital (Modelling Business Process)
+
+
+<Grid cols=3>
+  <BigValue 
+    data={totaal} 
+    value=behandelkamers
+    title="# Type behandelkamers"    
+  />
+  <BigValue 
+    data={totaal} 
+    value=aandoeningen
+    title="# Aandoeningen"
+  />
+  <BigValue 
+    data={totaal} 
+    value=patienten
+    title="# Patienten"
+    fmt=num0
+  />
+  <BigValue 
+    data={totaal} 
+    value=gemiddeldeBehandeltijdMin
+    title="Gem. Behandeltijd (minuten)"
+    fmt=num0
+  />
+  <BigValue 
+    data={totaal} 
+    value=gemiddeldeWachttijdMin
+    title="Gem. Wachttijd (minuten)"
+    fmt=num0
+  />
+  <BigValue 
+    data={totaal} 
+    value=mediaanWachttijdMin
+    title="Mediane Wachttijd (minuten)"
+    fmt=num0
+  />
+
+</Grid>
+
+
+### Procesbeschrijving Ziekenhuis 
+Het pad dat een patiënt generiek bewandelt is als volgt:
+
+<img src="/model.png" alt="Diagram"/>
+
+### Factoren die werking van het proces beïnvloeden:
 
 <Grid cols=2>
 
 <div>
 
-**Afhankelijkheden**
+#### Afhankelijkheden
 - Toeloop van patiënten
 - Beschikbaarheid van diagnose- en behandelcapaciteit
 - Diagnose- en behandelfouten
 - Gelimiteerde capaciteit: het ziekenhuis heeft een eindige capaciteit
+- Behandelprotocollen die diagnose- en behandeltijd dicteren.
 
 </div>
 
 <div>
 
-**Onzekerheden**
+#### Onzekerheden
 - Variatie in voorkomendheid van te behandelen aandoeningen
 - Onbeschikbaarheid van apparatuur door slijtage en storingen
-- Beschikbaarheid van personeel door verloop
+- Beschikbaarheid van personeel door verloop en onbeschikbaarheid
 
 </div>
 
@@ -112,18 +130,12 @@ Theme Hospital hanteert een **maandelijkse rapportagecyclus** om de operatie op 
 
 ---
 
-## Informatiebehoefte van Dr. Van Dalen
+## Opzetten van een oplossing (Defining the solution/prototyping)
 
-1. Wat zijn de wachttijden in het ziekenhuis?
-2. Wat is de benuttingsgraad van de behandelkamers?
-3. Is de verhouding met de zorgcapaciteit in balans?
-4. Hoe ontwikkelt de benutting zich door de tijd?
-5. Hoe ontwikkelt de capaciteit zich door de tijd?
-6. Welke instrumenten zijn er om eventuele problemen te voorkomen?
-7. Kan benutting en capaciteit gemodelleerd worden voor forecasts?
+1. Visualiseren van belangrijkste indicatoren middels een maandelijks dashboard
+2. Scenario's en planvorming aan de hand van bepaalde grenswaarden
 
 ---
-
 
 
 ```sql totaal

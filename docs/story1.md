@@ -1,4 +1,4 @@
-# 1️⃣ Story 1 - Probleem en besluitcontexten 
+ # 1️⃣ Story 1 - Probleem en besluitcontexten 
 
 ## 🏆 Op te leveren artefacten
 • Overzicht van probleemdefinities met besluitcontext

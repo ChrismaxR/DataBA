@@ -22,3 +22,5 @@ static/data
 oud/fct_event.csv
 .gitignore
 oud/hospital.duckdb
+dashboard/sources/hospital/hospital.duckdb
+

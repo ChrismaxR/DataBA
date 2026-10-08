@@ -31,6 +31,28 @@ resource_definitie <- data.frame(
     "Jelly Vat",
     "Decontamination"
   ),
+  resource_type = c(
+    "Receptie",
+    "Diagonose",
+    "Diagonose",
+    "Diagonose",
+    "Diagonose",
+    "Diagonose",
+    "Diagonose",
+    "Behandeling",
+    "Behandeling",
+    "Behandeling",
+    "Behandeling",
+    "Behandeling",
+    "Behandeling",
+    "Behandeling",
+    "Ontwikkeling",
+    "Behandeling",
+    "Behandeling",
+    "Behandeling",
+    "Behandeling",
+    "Behandeling"
+  ),
   capacity = c(
     3,
     3,

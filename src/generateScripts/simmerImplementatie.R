@@ -3,6 +3,7 @@
 
 library(simmer)
 library(dplyr)
+library(stringr)
 set.seed(42)
 
 # configuratiesettings -------
@@ -374,39 +375,57 @@ resources <- get_mon_resources(env) |>
     janitor::clean_names(case = "small_camel") |>
     tibble()
 
-# 6) Wrangle data -------------
+# 6) Wrangle data voor database -------------
+
+dim_aandoening <- aandoeningDimensies |>
+    transmute(
+        id = as.numeric(id),
+        aandoeningNaam = aandoeningOmschrijving
+    )
 
 # In de log_() functie kan ik allemaal eigenschappen van patienten kwijt
 # als ik dat doet met de vorm "eigenschap = nummeriekeWaarde", dan kan ik deze eenvoudig in deze tibble kwijt.
 patientAttributes <- log_df |>
-    filter(str_detect(message, "^aandoeningId")) |>
+    filter(stringr::str_detect(message, "^aandoeningId")) |>
     transmute(
         patient = arrival,
         type = str_trim(str_extract(message, "^[^=]+")),
         value = str_extract(message, "(?<=\\=\\s).*")
     ) |>
-    pivot_wider(names_from = type, values_from = value) |>
+    tidyr::pivot_wider(names_from = type, values_from = value) |>
     left_join(aandoeningDimensies, by = c("aandoeningId" = "id"))
 
-log_aankomst_ontslag <- log_df |>
-    filter(message %in% c("aankomstTijdstip", "ontslagTijdstip")) |>
-    pivot_wider(names_from = message, values_from = time) |>
-    mutate(
-        duratieInZiekenhuis = if_else(
-            !is.na(ontslagTijdstip),
-            ontslagTijdstip - aankomstTijdstip,
-            NA_real_
-        ),
-        aankomstTijdstipReal = to_datetime(aankomstTijdstip),
-        ontslagTijdstipReal = to_datetime(ontslagTijdstip),
-        aankomstTijdstipMonth = month(aankomstTijdstipReal, label = T),
-        ontstlagTijdstipMonth = month(ontslagTijdstipReal, label = T)
-    ) |>
-    rename(patient = 1) |>
-    left_join(patientAttributes, by = "patient")
+dim_patient <- patientAttributes |>
+    transmute(
+        id = str_remove(patient, "^patient"),
+        aandoeningId = as.numeric(aandoeningId)
+    )
 
-# waitTime berekenen (maar nog niet zeker of dit de juiste manier is), factor maken van resources
-# plus daadwerkelijke tijdstippen maken m.b.v. helper uit
+dim_behandelkamer <- tibble::as_tibble(resource_definitie) |>
+    transmute(
+        id,
+        behandelkamerNaam = resourceName,
+        behandelkamerType = resource_type
+    )
+
+fct_behandelkamer <- resources |>
+    left_join(
+        dim_behandelkamer |>
+            rename(behandelkamerId = id),
+        by = c("resource" = "behandelkamerNaam")
+    ) |>
+    transmute(
+        id = row_number(),
+        tijdstip = to_datetime(time),
+        behandelkamerId,
+        patientenInBehandeling = server,
+        capaciteit = capacity,
+        patientenInWachtrij = queue,
+        maxWachtrijOmvang = queueSize,
+        wachtrijLimiet = limit,
+        totaalPatientenBijBehandelkamer = system,
+        simulatieRun = replication
+    )
 
 # simmer registreert zelf niet welke fysieke server/kamer een aankomst bezette
 # (get_mon_resources geeft enkel een aantal bezette servers per tijdstip terug).
@@ -420,48 +439,64 @@ log_aankomst_ontslag <- log_df |>
 # geopend werd. 1e-6 minuten ligt ver onder elk reeel wachttijdverschil.
 kamer_tolerantie <- 1e-6
 
-ken_kamerNummer_slots_toe <- function(df) {
-    service_start <- df$startTime + df$waitTime
-    volgorde <- order(service_start)
-    vrij_vanaf <- numeric(0)
-    kamerNummer <- integer(nrow(df))
-
-    for (i in volgorde) {
-        vrije_slot <- which(vrij_vanaf <= service_start[i] + kamer_tolerantie)[
-            1
-        ]
-        if (is.na(vrije_slot)) {
-            vrij_vanaf <- c(vrij_vanaf, df$endTime[i])
-            vrije_slot <- length(vrij_vanaf)
-        } else {
-            vrij_vanaf[vrije_slot] <- df$endTime[i]
-        }
-        kamerNummer[i] <- vrije_slot
-    }
-
-    df$kamerNummer <- kamerNummer
-    df
+# Wachttijd = totale verblijfstijd bij resource minus daadwerkelijke behandeltijd
+# (simmer levert zelf geen wachttijdkolom).
+bereken_wachttijd <- function(startTijdstip, eindTijdstip, behandeltijd) {
+    (eindTijdstip - startTijdstip) - behandeltijd
 }
 
-events_wrangle <- events |>
-    left_join(patientAttributes, by = c("name" = "patient")) |>
-    mutate(
-        # waitTime = tijd in de wachtrij = totale verblijfstijd bij resource minus daadwerkelijke behandeltijd
-        # (endTime - startTime) geeft de totale tijd, activityTime is de diensttijd -> verschil is wachttijd
-        waitTime = (endTime - activityTime) - startTime,
-        resource = factor(
-            resource,
-            levels = resource_definitie$resourceName
-        ),
-        startTimeReal = to_datetime(startTime),
-        endTimeReal = to_datetime(endTime),
-        startTimeMonth = month(startTimeReal, label = T),
-        endTimeMonth = month(endTimeReal, label = T),
-        acitivityMonth = month(endTimeReal - dminutes(activityTime))
+# Eén stap: geef de patiënt de laagst genummerde kamer die vrij is bij
+# behandelStart, anders een nieuwe kamer. vrij_vanaf = per kamer het tijdstip
+# waarop die weer vrijkomt.
+bezet_vrije_kamer <- function(toestand, behandelStart, eindTijdstip) {
+    vrij_vanaf <- toestand$vrij_vanaf
+    kamer <- purrr::detect_index(vrij_vanaf, \(t) {
+        t <= behandelStart + kamer_tolerantie
+    })
+    if (kamer == 0) {
+        kamer <- length(vrij_vanaf) + 1L
+    }
+    vrij_vanaf[kamer] <- eindTijdstip
+    list(vrij_vanaf = vrij_vanaf, kamer = kamer)
+}
+
+# Loopt de bezoeken van één resource af op volgorde van behandelstart en geeft
+# de kamernummers terug in de oorspronkelijke rijvolgorde.
+wijs_kamernummer_toe <- function(behandelStart, eindTijdstip) {
+    volgorde <- order(behandelStart)
+    kamers <- purrr::accumulate2(
+        behandelStart[volgorde],
+        eindTijdstip[volgorde],
+        bezet_vrije_kamer,
+        .init = list(vrij_vanaf = numeric(0), kamer = NA_integer_)
     ) |>
-    mutate(rijVolgorde = row_number()) |>
+        purrr::map_int("kamer")
+    kamers[-1][order(volgorde)] # [-1] = .init weglaten
+}
+
+fct_gebeurtenis <- events |>
+    mutate(wachttijd = bereken_wachttijd(startTime, endTime, activityTime)) |>
     group_by(resource) |>
-    group_modify(~ ken_kamerNummer_slots_toe(.x)) |>
+    mutate(
+        behandelkamerNummer = wijs_kamernummer_toe(
+            startTime + wachttijd,
+            endTime
+        )
+    ) |>
     ungroup() |>
-    arrange(rijVolgorde) |>
-    dplyr::select(-rijVolgorde) #simmmer heeft ook select function... da's niet best.
+    left_join(
+        dim_behandelkamer |>
+            select(behandelkamerId = id, behandelkamerNaam),
+        by = c("resource" = "behandelkamerNaam")
+    ) |>
+    transmute(
+        id = row_number(),
+        patientId = str_remove(name, "^patient"),
+        startTijdstip = to_datetime(startTime),
+        eindTijdstip = to_datetime(endTime),
+        behandeltijd = activityTime,
+        wachttijd,
+        behandelkamerId,
+        behandelkamerNummer,
+        simulatieRun = replication
+    )
