@@ -57,46 +57,6 @@ Theme Hospital hanteert een **maandelijkse rapportagecyclus** om de operatie te 
 
 ## Modelleren van Theme Hospital (Modelling Business Process)
 
-
-<Grid cols=3>
-  <BigValue 
-    data={totaal} 
-    value=behandelkamers
-    title="# Type behandelkamers"    
-  />
-  <BigValue 
-    data={totaal} 
-    value=aandoeningen
-    title="# Aandoeningen"
-  />
-  <BigValue 
-    data={totaal} 
-    value=patienten
-    title="# Patienten"
-    fmt=num0
-  />
-  <BigValue 
-    data={totaal} 
-    value=gemiddeldeBehandeltijdMin
-    title="Gem. Behandeltijd (minuten)"
-    fmt=num0
-  />
-  <BigValue 
-    data={totaal} 
-    value=gemiddeldeWachttijdMin
-    title="Gem. Wachttijd (minuten)"
-    fmt=num0
-  />
-  <BigValue 
-    data={totaal} 
-    value=mediaanWachttijdMin
-    title="Mediane Wachttijd (minuten)"
-    fmt=num0
-  />
-
-</Grid>
-
-
 ### Procesbeschrijving Ziekenhuis 
 Het pad dat een patiënt generiek bewandelt is als volgt:
 
@@ -138,7 +98,8 @@ Het pad dat een patiënt generiek bewandelt is als volgt:
 ---
 
 
-```sql totaal
-select * from totaal
 
+
+
+``` sql totaal
 ```

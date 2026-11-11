@@ -1,4 +1,3 @@
-.gitignore
 .DS_Store
 recourses/discrete-event-system-simulation-jerry-banks_2.pdf
 docs/png/codeBranchWorkflow.png
@@ -20,7 +19,5 @@ static/data
 /storytelling/project_files
 /storytelling/StoryThemeHospital_files
 oud/fct_event.csv
-.gitignore
 oud/hospital.duckdb
 dashboard/sources/hospital/hospital.duckdb
-

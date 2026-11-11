@@ -2,19 +2,22 @@ library(duckdb)
 
 con <- dbConnect(
   drv = duckdb(),
-  dbdir = here::here("dashboard", "sources", "hospital", "hospital.duckdb")
+  dbdir = "dashboard/sources/hospital/hospital.duckdb"
 )
 
 
 # set up datamodel tabellen --------------
-# Fact-tabellen eerst droppen: een dimensie kan niet vervangen worden zolang
-# een foreign key ernaar verwijst.
+# Droppen in omgekeerde afhankelijkheidsvolgorde: een tabel kan niet gedropt
+# worden zolang een foreign key ernaar verwijst (fct_* -> dim_patient -> dim_aandoening).
 dbExecute(con, "DROP TABLE IF EXISTS fct_gebeurtenis")
 dbExecute(con, "DROP TABLE IF EXISTS fct_behandelkamer")
+dbExecute(con, "DROP TABLE IF EXISTS dim_patient")
+dbExecute(con, "DROP TABLE IF EXISTS dim_aandoening")
+dbExecute(con, "DROP TABLE IF EXISTS dim_behandelkamer")
 
 dbExecute(
   con,
-  "CREATE OR REPLACE TABLE dim_aandoening (
+  "CREATE TABLE dim_aandoening (
     id INTEGER PRIMARY KEY,
     aandoeningNaam TEXT NOT NULL
     )"
@@ -22,7 +25,7 @@ dbExecute(
 
 dbExecute(
   con,
-  "CREATE OR REPLACE TABLE dim_patient (
+  "CREATE TABLE dim_patient (
     id INTEGER PRIMARY KEY,
     aandoeningId INTEGER REFERENCES dim_aandoening (id)
     )"
@@ -30,7 +33,7 @@ dbExecute(
 
 dbExecute(
   con,
-  "CREATE OR REPLACE TABLE dim_behandelkamer (
+  "CREATE TABLE dim_behandelkamer (
     id INTEGER PRIMARY KEY,
     behandelkamerNaam TEXT NOT NULL,
     behandelkamerType TEXT
