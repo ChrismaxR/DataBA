@@ -8,23 +8,25 @@ hide_toc: true
 
 ![Theme Hospital](/hero.png)
 
-# Case: Wachttijden & Capaciteitsbeheer in een fictief Ziekenhuis
+# Case: Scenario's voor het meerjarig beleidsplan van een fictief ziekenhuis
 
-Dit is een casebeschrijving van hoe ik als Business Analist binnenn een data/BI team een project zou uitvoeren. 
+Dit is een casebeschrijving van hoe ik als Business Analist binnen een data/BI-team een project zou aanpakken.
 
-Deze case betreft een zogenaamde 'Discrete Event Simulatie' (DES) van een volledig jaar ziekenhuisoperaties in het fictieve ziekenhuis Theme Hospital. De simulatie modelleert de behandeling van patiënten — van aankomst tot ontslag — met in totaal 33 aandoeningen in 19 verschillende type behandelkamers. De set is gebaseerd op een ziekenhuissimulatiespel (scrabble woord!) uit de jaren negentig, wat ik met veel plezier helemaal kapot heb gespeeld.  
+De case draait om Theme Hospital, een fictief ziekenhuis gebaseerd op een ziekenhuissimulatiespel uit de jaren negentig dat ik met veel plezier helemaal kapot heb gespeeld. Patiënten komen binnen met één van 33 aandoeningen en doorlopen een vast pad langs de receptie, een diagnosekamer en een behandelkamer, verdeeld over 19 typen kamers.
+
+Met een zogenaamde *Discrete Event Simulatie* (DES) wordt eerst een volledig jaar van de huidige operatie nagebootst. Daarna rekent hetzelfde model door hoe het ziekenhuis zich houdt als zorgvraag en zorgaanbod in de komende jaren veranderen.
 
 ---
-## De Stakeholder (Stakeholder/user analysis)
+## De Stakeholder
 
 <Grid cols=2>
 
 
 <div>
-Dr. Van Dalen is COO bij Theme Hospital in ThemeVille. Ze is 44 jaar en vervult al een aantal jaren haar rol in het ziekenhuis. Ze voelt zich betrokken bij het welbevinden van patiënten en medewerkers, en heeft als centraal richtpunt een fluïde doorloop van het zorgsysteem: van aankomst tot afronding van de juiste behandeling.<br> <br>  
-Haar voornaamste doel is operationele excellence. De sleutel daartoe ligt in het effectief benutten van zorgcapaciteit en het managen van wachttijden.
+Dr. Van Dalen is COO bij Theme Hospital in ThemeVille. Ze is 44 jaar en vervult al een aantal jaren haar rol in het ziekenhuis. Ze voelt zich betrokken bij het welbevinden van patiënten en medewerkers, en heeft als centraal richtpunt een fluïde doorloop van het zorgsysteem: van aankomst tot afronding van de juiste behandeling.<br> <br>
+Haar standaardrapportage is op orde: ze weet hoe benutting en wachttijden er vandaag voorstaan. Nu schrijft ze een <b>meerjarig beleidsplan</b>, en daarvoor moet ze vooruitkijken.
 
-> *"Waar moet ik volgende maand capaciteit toevoegen of herverdelen om wachttijden onder X te houden?"*
+> *"Welke toekomstige situaties moet ik aankunnen, en wat doen die met benutting en wachttijden, gegeven mijn behandelcapaciteit?"*
 
 </div>
 
@@ -33,34 +35,79 @@ Haar voornaamste doel is operationele excellence. De sleutel daartoe ligt in het
 
 </Grid>
 
-Deze vraag juist beantwoorden heeft een positief effect op:
+Een goed onderbouwd antwoord op deze vraag helpt haar om:
 
-- de gezondheid en het welbevinden van patiënten
-- de optimale benutting van personeel en middelen
-- de reputatie & financieel resultaat van het ziekenhuis
-
----
-
-## Informatiebehoefte van Dr. Van Dalen (Requirements engineering)
-
-1. Wat zijn de wachttijden in het ziekenhuis?
-2. Wat is de benuttingsgraad van de behandelkamers?
-3. Is de verhouding tussen zorgcapaciteit en benutting in balans?
-4. Hoe ontwikkelt de benutting zich door de tijd?
-5. Hoe ontwikkelt de capaciteit zich door de tijd?
-6. Welke instrumenten zijn er om eventuele problemen te voorkomen?
-7. Kan benutting en capaciteit gemodelleerd worden voor forecasts?
-
-Theme Hospital hanteert een **maandelijkse rapportagecyclus** om de operatie te reviewen.
+- tijdig te investeren in de kamers en het personeel die als eerste een knelpunt worden
+- wachttijden ook onder veranderende omstandigheden binnen de norm te houden
+- keuzes in het beleidsplan te verantwoorden met cijfers in plaats van onderbuikgevoel
 
 ---
 
-## Modelleren van Theme Hospital (Modelling Business Process)
+## Informatiebehoefte van Dr. Van Dalen
 
-### Procesbeschrijving Ziekenhuis 
-Het pad dat een patiënt generiek bewandelt is als volgt:
+1. Welke operationele scenario's staat het Ziekenhuis te wachten?
+2. Wat gebeurt er met de benutting en wachttijden in elk scenario?
+3. Welke behandelkamers worden als eerste een knelpunt, en wanneer?
+4. Hoeveel extra (of herverdeelde) capaciteit is nodig om wachttijden onder de norm te houden?
+5. Hoe groot is de onzekerheid rond gevonden uitkomsten?
+
+---
+
+## Modelleren van de Business
+
+### Procesbeschrijving Ziekenhuis
+Het ziekenhuis is dagelijks van 9.00 tot 17.00u geopend. Het pad dat een patiënt generiek bewandelt is als volgt:
 
 <img src="/model.png" alt="Diagram"/>
+<br/>
+
+Indien een patiënt niet volledig gedurende een dag behandelt kan worden, dan komt de patiënt de volgende dag terug voor diens resterende behandeling.
+
+### Verdere detailering
+Het standaard _operating model_ kan vervolgens per diagnose- en behandelkamer begrepen worden:
+
+
+
+
+<script>
+  // Route-boom: kleur van behandelkamers en aandoeningen per behandelingType
+  const kleur = { Polikliniek: '#4E79A7', Kliniek: '#E15759' };
+  const groep = (rows, key) => [...new Set(rows.map(r => r[key]))]
+    .map(naam => [naam, rows.filter(r => r[key] === naam)]);
+
+  $: boom = {
+    name: 'Receptie',
+    children: groep(routes, 'diagnose').map(([d, dRows]) => ({
+      name: d,
+      children: groep(dRows, 'behandeling').map(([b, bRows]) => ({
+        name: b,
+        itemStyle: { color: kleur[bRows[0].behandelingType] },
+        children: bRows.map(r => ({ name: r.aandoeningNaam,
+                                    itemStyle: { color: kleur[r.behandelingType] } }))
+      }))
+    }))
+  };
+</script>
+
+
+```sql routes
+select r.*, k.behandelkamerType as behandelingType
+from hospital.dim_aandoeningRoutes r
+left join hospital.dim_behandelkamer k on k.id = r.behandelingId
+```
+
+<ECharts config={{
+  tooltip: { trigger: 'item' },
+  series: [{ type: 'tree', data: [boom], initialTreeDepth: -1,
+             left: 80, right: 160,  // vaste ruimte in px voor de labels van root en bladeren
+             label: { position: 'left' },
+             leaves: { label: { position: 'right', width: 150, overflow: 'truncate' } } }]
+}} height="750px" />
+
+<br/>
+<span style="color: #4E79A7; font-weight: bold">Poliklinische</span> en <span class="text-[#E15759] font-bold">klinische</span> behandelingen zijn aan hun kleur te herkennen.
+
+---
 
 ### Factoren die werking van het proces beïnvloeden:
 
@@ -71,35 +118,38 @@ Het pad dat een patiënt generiek bewandelt is als volgt:
 #### Afhankelijkheden
 - Toeloop van patiënten
 - Beschikbaarheid van diagnose- en behandelcapaciteit
-- Diagnose- en behandelfouten
 - Gelimiteerde capaciteit: het ziekenhuis heeft een eindige capaciteit
-- Behandelprotocollen die diagnose- en behandeltijd dicteren.
+- Werktijden: behandelingen die niet binnen de werkdag afkomen, lopen door naar de volgende dag
+- Behandelprotocollen die diagnose- en behandeltijd dicteren
 
 </div>
 
 <div>
 
 #### Onzekerheden
-- Variatie in voorkomendheid van te behandelen aandoeningen
-- Onbeschikbaarheid van apparatuur door slijtage en storingen
-- Beschikbaarheid van personeel door verloop en onbeschikbaarheid
+- Verschuiving in de mix van aandoeningen
+- Epidemische golven van infectieziekten
+- Omvang en grilligheid in aanloop van de patiëntenpopulatie
+- Beschikbaarheid van personeel door krapte op de arbeidsmarkt
 
 </div>
 
 </Grid>
 
----
 
-## Opzetten van een oplossing (Defining the solution/prototyping)
-
-1. Visualiseren van belangrijkste indicatoren middels een maandelijks dashboard
-2. Scenario's en planvorming aan de hand van bepaalde grenswaarden
 
 ---
 
+## Scenario's
+
+Dr. Van Dalen heeft al een aantal hoogover scenario's in haar hoofd:
+
+| # | Scenario | Wat verandert er |
+|---|----------|------------------|
+| 1 | **Verschuiving in ziekten** | Meer welvaarts- en ouderdomsziekten, en daardoor een andere mix van aandoeningen en routes |
+| 2 | **Infectieziekten** | Epidemische golven van één of meer infectieziekten (geen pandemieën) |
+| 3 | **Grotere en grilligere patiëntenpopulatie** | Een hogere en minder voorspelbare toeloop |
+| 4 | **Arbeidsmarktkrapte** | Een permanent of tijdelijk tekort aan specifiek zorgpersoneel, en dus minder beschikbare kamers |
 
 
-
-
-``` sql totaal
-```
+---

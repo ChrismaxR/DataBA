@@ -22,7 +22,7 @@ Zie [Fasering.md](Fasering.md) voor het implementatieplan.
 
 Dr. Van Dalen, COO van Theme Hospital, heeft haar standaardrapportage op orde. Ze weet hoe het ziekenhuis vandaag draait:
 
-- **Bezetting & benutting** van behandelkamers en personeel
+- **Benutting** van behandelkamers en personeel
 - **Wachttijden** per kamer en per aandoening
 - Patiënttevredenheid, medewerkerstevredenheid en financiële balans *(buiten scope van dit project)*
 

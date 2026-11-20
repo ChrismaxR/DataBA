@@ -1,5 +1,9 @@
 # Configuratiescript voor de simmer simulatie
 
+dim_aandoeningRoutes <- readr::read_csv(
+  "dashboard/sources/hospital/AandoeningRoutes.csv"
+)
+
 ## Duratie van de simulatie - je geeft het in minuten op.
 dayMinutes <- 24 * 60
 workDayMinutes <- 8 * 60
@@ -187,7 +191,7 @@ aandoeningDimensies <- tibble::tibble(
 # helperfuncties --------------
 
 # Zet de starttijdstip om vanuit te rekenen
-simOrigin <- as.POSIXct("2025-01-01 09:00:00", tz = "UTC")
+simOrigin <- as.POSIXct("2026-01-01 09:00:00", tz = "UTC")
 
 # conversiefunctie om relatieve simmertijdstippen om te zetten naar "echte" datetimes
 to_datetime <- function(timeMinutes) {

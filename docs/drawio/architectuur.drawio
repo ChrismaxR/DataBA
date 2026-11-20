@@ -1,0 +1,63 @@
+<mxfile host="65bd71144e">
+    <diagram id="architectuur" name="Architectuur">
+        <mxGraphModel dx="2710" dy="623" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1240" pageHeight="320" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="-40" y="10" width="1290" height="260" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfg" value="1 · Configuratie" style="swimlane;startSize=30;rounded=1;arcSize=6;fillColor=#fff4e0;strokeColor=#e0a040;fontStyle=1;swimlaneFillColor=#fffaf0;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="40" width="190" height="200" as="geometry">
+                        <mxRectangle x="40" y="40" width="130" height="30" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="config" value="simmerConfig.R&lt;br&gt;scenarioDefinities.R" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff4e0;strokeColor=#e0a040;fontColor=#333333;" parent="cfg" vertex="1">
+                    <mxGeometry x="20" y="85" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="simLane" value="2 · Simulatie" style="swimlane;startSize=30;rounded=1;arcSize=6;fillColor=#e6f0ff;strokeColor=#4a7bd0;fontStyle=1;swimlaneFillColor=#f5f9ff;" parent="1" vertex="1">
+                    <mxGeometry x="270" y="40" width="190" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="sim" value="simmerImplementatie.R&lt;br&gt;R / simmer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f0ff;strokeColor=#4a7bd0;fontColor=#333333;" parent="simLane" vertex="1">
+                    <mxGeometry x="20" y="85" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="wrg" value="3 · Data wrangling" style="swimlane;startSize=30;rounded=1;arcSize=6;fillColor=#eaf7ea;strokeColor=#4caf50;fontStyle=1;swimlaneFillColor=#f5fbf5;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="40" width="190" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="wrangle" value="Sterschema&lt;br&gt;dim_* / fct_*" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf7ea;strokeColor=#4caf50;fontColor=#333333;" parent="wrg" vertex="1">
+                    <mxGeometry x="20" y="85" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="db" value="4 · Data-opslag" style="swimlane;startSize=30;rounded=1;arcSize=6;fillColor=#f3e8ff;strokeColor=#8e5bd0;fontStyle=1;swimlaneFillColor=#faf5ff;" parent="1" vertex="1">
+                    <mxGeometry x="730" y="40" width="190" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="dbu" value="databaseUtils.R" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e8ff;strokeColor=#8e5bd0;fontColor=#333333;" parent="db" vertex="1">
+                    <mxGeometry x="20" y="45" width="150" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="duck" value="hospital.duckdb" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;size=10;fillColor=#f3e8ff;strokeColor=#8e5bd0;fontColor=#333333;" parent="db" vertex="1">
+                    <mxGeometry x="35" y="120" width="120" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="evd" value="5 · Visualisatie" style="swimlane;startSize=30;rounded=1;arcSize=6;fillColor=#ffe8ec;strokeColor=#d0506a;fontStyle=1;swimlaneFillColor=#fff5f7;" parent="1" vertex="1">
+                    <mxGeometry x="960" y="40" width="190" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="evidence" value="Evidence.dev&lt;br&gt;SQL + pagina's" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe8ec;strokeColor=#d0506a;fontColor=#333333;" parent="evd" vertex="1">
+                    <mxGeometry x="20" y="85" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#555555;" parent="1" source="config" target="sim" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#555555;" parent="1" source="sim" target="wrangle" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#555555;" parent="1" source="wrangle" target="dbu" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#555555;" parent="1" source="dbu" target="duck" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#555555;" parent="1" source="duck" target="evidence" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

@@ -1,0 +1,34 @@
+aandoeningId,aandoeningNaam,route,aankomstId,aankomst,diagnoseId,diagnose,behandelingId,behandeling
+1,Sleeping Illness,A,1,Reception,2,GP's Office,8,The Ward
+2,Discrete Itching,A,1,Reception,2,GP's Office,8,The Ward
+3,Fake Blood,A,1,Reception,2,GP's Office,8,The Ward
+4,The Squits,B,1,Reception,2,GP's Office,10,Pharmacy
+5,Sweaty Palms,B,1,Reception,2,GP's Office,10,Pharmacy
+6,Gastric Ejections,B,1,Reception,2,GP's Office,10,Pharmacy
+7,Uncommon Cold,B,1,Reception,2,GP's Office,10,Pharmacy
+8,Chronic Nosehair,C,1,Reception,2,GP's Office,18,Electrolysis
+9,Hairyitis,C,1,Reception,2,GP's Office,18,Electrolysis
+10,Baldness,D,1,Reception,2,GP's Office,14,Hair Restoration
+11,King Complex,E,1,Reception,2,GP's Office,9,Psychiatric Room
+12,Infectious Laughter,E,1,Reception,2,GP's Office,9,Psychiatric Room
+13,TV Personalities,E,1,Reception,2,GP's Office,9,Psychiatric Room
+14,Ruptured Nodules,F,1,Reception,3,General Diagnosis Room,11,Operating Theatre
+15,Broken Wind,F,1,Reception,3,General Diagnosis Room,11,Operating Theatre
+16,Golf Stones,F,1,Reception,3,General Diagnosis Room,11,Operating Theatre
+17,Iron Lungs,F,1,Reception,3,General Diagnosis Room,11,Operating Theatre
+18,Gut Rot,G,1,Reception,3,General Diagnosis Room,10,Pharmacy
+19,Heaped Piles,G,1,Reception,3,General Diagnosis Room,10,Pharmacy
+20,3rd Degree Sideburns,H,1,Reception,3,General Diagnosis Room,18,Electrolysis
+21,Bloaty Head,I,1,Reception,3,General Diagnosis Room,12,Inflation Room
+22,Slack Tongue,J,1,Reception,3,General Diagnosis Room,16,Slack Tongue Clinic
+23,Broken Heart,K,1,Reception,4,Cardiogram,17,Fracture Clinic
+24,Spare Ribs,L,1,Reception,7,X-Ray,17,Fracture Clinic
+25,Corrugated Ankles,L,1,Reception,7,X-Ray,17,Fracture Clinic
+26,Fractured Bones,L,1,Reception,7,X-Ray,17,Fracture Clinic
+27,Kidney Beans,M,1,Reception,7,X-Ray,11,Operating Theatre
+28,Unexpected Swelling,N,1,Reception,7,X-Ray,10,Pharmacy
+29,Serious Radiation,O,1,Reception,7,X-Ray,20,Decontamination
+30,Jellyitis,P,1,Reception,5,Scanner,19,Jelly Vat
+31,Transparency,Q,1,Reception,5,Scanner,10,Pharmacy
+32,Invisibility,R,1,Reception,6,Ultrascan,10,Pharmacy
+33,Alien DNA,S,1,Reception,6,Ultrascan,13,DNA Fixer

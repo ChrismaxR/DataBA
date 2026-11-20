@@ -14,6 +14,7 @@ dbExecute(con, "DROP TABLE IF EXISTS fct_behandelkamer")
 dbExecute(con, "DROP TABLE IF EXISTS dim_patient")
 dbExecute(con, "DROP TABLE IF EXISTS dim_aandoening")
 dbExecute(con, "DROP TABLE IF EXISTS dim_behandelkamer")
+dbExecute(con, "DROP TABLE IF EXISTS dim_aandoeningroutes")
 
 dbExecute(
   con,
@@ -72,6 +73,21 @@ dbExecute(
     )"
 )
 
+dbExecute(
+  con,
+  "CREATE TABLE dim_aandoeningroutes (
+    aandoeningId INTEGER PRIMARY KEY,
+    aandoeningNaam TEXT,
+    route TEXT,
+    aankomstId INTEGER REFERENCES dim_behandelkamer (id),
+    aankomst TEXT,
+    diagnoseId INTEGER REFERENCES dim_behandelkamer (id),
+    diagnose TEXT,
+    behandelingId INTEGER REFERENCES dim_behandelkamer (id),
+    behandeling TEXT
+    )"
+)
+
 # write to datamodel tabellen --------------
 # dbAppendTable i.p.v. dbWriteTable(overwrite = T): zo blijven de types en
 # keys uit de CREATE-statements behouden. Dimensies voor facts i.v.m. foreign keys.
@@ -80,5 +96,6 @@ dbAppendTable(con, "dim_patient", dim_patient)
 dbAppendTable(con, "dim_behandelkamer", dim_behandelkamer)
 dbAppendTable(con, "fct_gebeurtenis", fct_gebeurtenis)
 dbAppendTable(con, "fct_behandelkamer", fct_behandelkamer)
+dbAppendTable(con, "dim_aandoeningroutes", dim_aandoeningRoutes)
 
 dbDisconnect(con)
